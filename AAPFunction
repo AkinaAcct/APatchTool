@@ -1,0 +1,121 @@
+#by nya
+#2024-02-04
+
+get_device_boot() { # 未指定boot路径时从设备boot分区获取boot镜像
+	echo "${BLUE}I: Getting boot image...${RESET}"
+	echo
+
+	if [[ -z "${BOOTPATH}" ]]; then
+		echo "${BLUE}I: Current boot: ${BOOTSUFFIX}(If empty: A-Only devices)${RESET}"
+		dd if=/dev/block/by-name/boot${BOOTSUFFIX} of=${WORKDIR}/boot${BOOTSUFFIX}.img
+		EXITSTATUS=$?
+		if [[ $EXITSTATUS != 0 ]]; then
+			echo "${RED}E: GET BOOT IMAGE FAILED${RESET}"
+			exit 1
+		fi
+	else
+		cp ${BOOTPATH} ${WORKDIR}/boot${BOOTSUFFIX}.img
+	fi
+	echo "${GREEN}I: Done.${RESET}"
+}
+
+get_tools() { # 从GitHub下载工具
+	cd ${WORKDIR}
+	echo "${BLUE}I: Downloading the latest kptools-android...${RESET}"
+	curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-android"
+	EXITSTATUS=$?
+	if [[ $EXITSTATUS != 0 ]]; then
+		echo "${RED}E: DOWNLOAD FAILED${RESET}"
+		echo "Please check your internet connection."
+		exit 1
+	fi
+	chmod +x kptools-android
+	echo "${GREEN}I: Done.${RESET}"
+	echo "${BLUE}I: Downloading the latest kpimg-android...${RESET}"
+	curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kpimg-android"
+	EXITSTATUS=$?
+	if [[ $EXITSTATUS != 0 ]]; then
+		echo "${RED}E: DOWNLOAD FAILED${RESET}"
+		echo "Please check your internet connection."
+		exit 1
+	fi
+	echo "${GREEN}I: Done.${RESET}"
+	echo "${BLUE}I: Downloading magiskboot...${RESET}"
+	curl -LO --progress-bar "https://raw.githubusercontent.com/magojohnji/magiskboot-linux/main/arm64-v8a/magiskboot"
+	EXITSTATUS=$?
+	if [[ $EXITSTATUS != 0 ]]; then
+		echo "${RED}E: DOWNLOAD FAILED${RESET}"
+		echo "Please check your internet connection."
+		exit 1
+	fi
+	chmod +x magiskboot
+	echo "${GREEN}I: Done.${RESET}"
+}
+
+patch_boot() { # 修补boot镜像
+	echo "${BLUE}I: Unpacking image...${RESET}"
+	./magiskboot unpack boot${BOOTSUFFIX}.img
+	EXITSTATUS=$?
+	if [[ $EXITSTATUS != 0 ]]; then
+		echo "${RED}E: UNPACK BOOT IMAGE FAILED!${RESET}"
+		exit 1
+	fi
+	echo "${GREEN}I: Done.${RESET}"
+	echo "${BLUE}I: Unpatching current image...${RESET}"
+	./kptools-android -u -i kernel -o kernel || EXITSTATUS=$?
+	if [[ ${EXITSTATUS} != 0 ]]; then
+		echo "${YELLOW}I: Maybe you are using stock boot image?${RESET}"
+		echo "${YELLOW}W: Now skipping unpatching...${RESET}"
+	else
+		echo "${GREEN}I: Done.${RESET}"
+	fi
+	echo "${BLUE}I: Patching image...Current Superkey: ${SUPERKEY}${RESET}"
+	./kptools-android -p -k kpimg-android -s ${SUPERKEY} -i kernel -o kernel
+	EXITSTATUS=$?
+	if [[ ${EXITSTATUS} != 0 ]]; then
+		echo "${RED}E: PATCH FAILED!${RESET}"
+		exit 1
+	fi
+	echo "${GREEN}I: Done${RESET}"
+	echo "${BLUE}I: Repacking...${RESET}"
+	./magiskboot repack boot${BOOTSUFFIX}.img
+	EXITSTATUS=$?
+	if [[ $EXITSTATUS != 0 ]]; then
+		echo "${RED}E: REPACK FAILED!${RESET}"
+		exit 1
+	fi
+	echo "${GREEN}I: Done.${RESET}"
+}
+
+flash_boot() { # 刷入boot镜像
+	echo "${BLUE}I: Flashing boot image...${RESET}"
+	dd if=${WORKDIR}/new-boot.img of=/dev/block/by-name/boot${BOOTSUFFIX}
+	EXITSTATUS=$?
+	if [[ ${EXITSTATUS} != 0 ]]; then
+		echo "${RED}E: WARNING!!! IMAGE FLASH FAILED${RESET}"
+		echo "${YELLOW}I: Now trying to restore...${RESET}"
+		dd if=${WORKDIR}/boot${BOOTSUFFIX}.img of=/dev/block/by-name/boot${BOOTSUFFIX}
+		EXITSTATUS=$?
+		if [[ ${EXITSTATUS} != 0 ]]; then
+			echo "${RED}E: WARNING!!! RESTORE FAILED!!!"
+			echo "Even I can't help you now. You can try to restore boot manually.${RESET}"
+			exit 1
+		fi
+		echo "${YELLOW}I: Restore Sucessfully.${RESET}"
+	fi
+	echo "${GREEN}I: Flash done.${RESET}"
+	echo "${BLUE}I: Cleaning temporary files...${RESET}"
+	rm -rf ${WORKDIR}
+	echo "${GREEN}I: Done.${RESET}"
+	cat <<EOF
+####################################
+
+
+    YOUR SUPERKEY IS ${SUPERKEY}
+
+    DON'T FORGET IT!!
+
+
+####################################
+EOF
+}
