@@ -40,19 +40,6 @@ Current WORKDIR:
 -s "STRING",            specify a superkey. Use STRING as superkey.
 ```
 
-Example:
-
-```bash
-# Before you run this script, grant root permission
-tsu
-
-# Directly run
-./AAP.sh 
-
-# Specify a boot **IMAGE** path (NOT BOOT PARTITION PATH)
-./AAP.sh -i /sdcard/Download/boot_a.img
-```
-
 ---
 
 ## TODO
