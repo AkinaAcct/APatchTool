@@ -21,7 +21,7 @@ while getopts ":i:hvns:" OPT; do
 		cat <<-EOF
 			APatch Auto Patch Tool
 			Written by nya
-			Version: 0.1.1
+			Version: 1.0.0
 			Current WORKDIR: ${WORKDIR}
 
 			-h, -v,                 print the usage and version.
@@ -85,7 +85,7 @@ rm -rf ${WORKDIR}
 
 mkdir -p ${WORKDIR}
 echo "${BLUE}I: Downloading files from GitHub...${RESET}"
-curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/Small-Tools/main/APatchAutoPatch/AAPFunction" -o ${WORKDIR}/AAPFunction
+curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
 EXITSTATUS=$?
 if [[ $EXITSTATUS != 0 ]]; then
 	echo "${RED}E: SOMETHING WENT WRONG! CHECK YOUR INTERNET CONNECTION!${RESET}"
