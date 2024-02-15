@@ -11,7 +11,7 @@ RESET="\E[0m"
 alias echo="echo -e"
 
 # 参数解析
-while getopts ":i:hvns:" OPT; do
+while getopts ":hvi:k:ns:" OPT; do
 	case $OPT in
 	i) # 处理选项i
 		BOOTPATH="${OPTARG}"
@@ -39,7 +39,11 @@ while getopts ":i:hvns:" OPT; do
 		;;
 	s)
 		SUPERKEY="${OPTARG}"
-		echo "${BLUE}I: The -s parameter was received. Currently specified SuperKey: ${SUPERKEY}${RESET}"
+		echo "${BLUE}I: The -s parameter was received. Currently specified SuperKey: ${SUPERKEY}.${RESET}"
+		;;
+	k)
+		KPTOOLVER="${OPTARG}"
+		echo "${BLUE}I: The -k parameter was received. Will use kptool ${KPTOOLVER}.${RESET}"
 		;;
 	:)
 		echo "${YELLOW}W: Option -$OPTARG requires an argument..${RESET}" >&2 && exit 1

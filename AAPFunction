@@ -1,3 +1,4 @@
+#!/bin/env bash
 #by nya
 #2024-02-04
 
@@ -18,10 +19,20 @@ get_device_boot() { # 未指定boot路径时从设备boot分区获取boot镜像
 }
 
 get_tools() { # 从GitHub下载工具
-	cd ${WORKDIR}
-	echo "${BLUE}I: Downloading the latest kptools-android...${RESET}"
-	curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-android"
-	EXITSTATUS=$?
+	cd ${WORKDIR} || exit 1
+	echo "${BLUE}I: Downloading kptools-android...${RESET}"
+	if [[ -n "${KPTOOLVER}" ]]; then
+		echo "${BLUE}I: Use the specified version: ${KPTOOLVER}${RESET}"
+	else
+		echo "${BLUE}I: Use the latest kptools.${RESET}"
+	fi
+	if [[ -n "${KPTOOLVER}" ]]; then
+		curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/download/${KPTOOLVER}/kptools-android"
+		EXITSTATUS=$?
+	else
+		curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-android"
+		EXITSTATUS=$?
+	fi
 	if [[ $EXITSTATUS != 0 ]]; then
 		echo "${RED}E: DOWNLOAD FAILED${RESET}"
 		echo "Please check your internet connection."
@@ -29,9 +40,14 @@ get_tools() { # 从GitHub下载工具
 	fi
 	chmod +x kptools-android
 	echo "${GREEN}I: Done.${RESET}"
-	echo "${BLUE}I: Downloading the latest kpimg-android...${RESET}"
-	curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kpimg-android"
-	EXITSTATUS=$?
+	echo "${BLUE}I: Downloading kpimg-android...${RESET}"
+	if [[ -n "${KPTOOLVER}" ]]; then
+		curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/download/${KPTOOLVER}/kpimg-android"
+		EXITSTATUS=$?
+	else
+		curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kpimg-android"
+		EXITSTATUS=$?
+	fi
 	if [[ $EXITSTATUS != 0 ]]; then
 		echo "${RED}E: DOWNLOAD FAILED${RESET}"
 		echo "Please check your internet connection."
