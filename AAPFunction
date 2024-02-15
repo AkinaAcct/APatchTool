@@ -121,6 +121,9 @@ flash_boot() { # 刷入boot镜像
 	echo "${BLUE}I: Cleaning temporary files...${RESET}"
 	rm -rf ${WORKDIR}
 	echo "${GREEN}I: Done.${RESET}"
+}
+
+print_superkey() {
 	cat <<EOF
 ####################################
 

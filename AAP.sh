@@ -121,3 +121,4 @@ if ${NOINSTALL}; then
 else
 	flash_boot
 fi
+print_superkey
