@@ -123,7 +123,7 @@ flash_boot() { # 刷入boot镜像
 	echo "${GREEN}I: Done.${RESET}"
 }
 
-print_superkey() {
+print_superkey() { # 打印 SUPERKEY
 	cat <<EOF
 ####################################
 
