@@ -48,4 +48,5 @@ Current WORKDIR:
 
 ---
 
-If you encounter any issues, please submit a issue on github or provide feedback to me: [Telegram](https://t.me/nya_main)
+
+If you encounter any issues, please submit a issue on github or provide feedback to me: [Telegram](https://t.me/RhineNya)
