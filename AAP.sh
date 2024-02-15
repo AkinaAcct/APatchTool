@@ -117,7 +117,6 @@ if ${NOINSTALL}; then
 	mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
 	rm -rf ${WORKDIR}
 	echo "${GREEN}I: Done.${RESET}"
-	exit 0
 else
 	flash_boot
 fi
