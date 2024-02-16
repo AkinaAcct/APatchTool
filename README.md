@@ -17,7 +17,7 @@ This script will:
 
 ```bash
 cd ${HOME}
-curl -LO https://github.com/nya-main/APatchAutoPatch/raw/main/AAP.sh
+curl -LO https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/AAP.sh
 chmod +x AAP.sh
 ```
 
