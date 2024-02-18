@@ -50,3 +50,11 @@ Current WORKDIR:
 
 
 If you encounter any issues, please submit a issue on github or provide feedback to me: [Telegram](https://t.me/RhineNya)
+
+---
+
+Credits:
+
+- [Magisk](https://github.com/topjohnwu/magisk): For magiskboot
+
+- [KernelPatch](https://github.com/bmax121/KernelPatch): For kptools and kpimg
