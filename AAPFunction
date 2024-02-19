@@ -55,7 +55,7 @@ get_tools() { # 从GitHub下载工具
 	fi
 	echo "${GREEN}I: Done.${RESET}"
 	echo "${BLUE}I: Downloading magiskboot...${RESET}"
-	curl -LO --progress-bar "https://raw.githubusercontent.com/magojohnji/magiskboot-linux/main/arm64-v8a/magiskboot"
+	curl -LO --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/bin/magiskboot"
 	EXITSTATUS=$?
 	if [[ $EXITSTATUS != 0 ]]; then
 		echo "${RED}E: DOWNLOAD FAILED${RESET}"
