@@ -44,7 +44,10 @@ Current WORKDIR:
 
 ## TODO
 
-- [x] User-specified boot image path.
+- [x] User-specified boot image path.  
+- [x] User-specified Superkey.  
+- [x] Specify KernelPatch version.  
+- [ ] Other terminal software support(e.g. MT).  
 
 ---
 
