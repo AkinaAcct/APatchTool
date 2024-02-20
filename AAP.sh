@@ -91,6 +91,17 @@ fi
 
 # 清理可能存在的上次运行文件
 rm -rf /data/local/nyatmp_*
+if (pm path me.bmax.apatch >/dev/null 2>&1); then
+	echo "${BLUE}I: Detected that APache is installed.${RESET}"
+	APKPATH="$(command echo $(pm path me.bmax.apatch) | sed 's/base.apk//g' | sed 's/package://g')"
+	APKLIBPATH="${APKPATH}lib/arm64"
+	APDVER="$(${APKLIBPATH}/libapd.so -V)"
+	LKPVER="$(${APKLIBPATH}/libkpatch.so -v)"
+	cat <<-EOF
+		Installed manager(apd) version: $(echo "${BLUE}${APDVER}${RESET}")
+		APatch app built-in KernelPatch version: $(echo "${BLUE}${LKPVER}${RESET}")
+	EOF
+fi
 
 mkdir -p ${WORKDIR}
 echo "${BLUE}I: Downloading files from GitHub...${RESET}"
