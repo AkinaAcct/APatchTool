@@ -30,7 +30,7 @@ Usage:
 APatch Auto Patch Tool
 Written by nya
 Version: 1.0.0
-Current WORKDIR:
+Current WORKDIR: /data/local/tmp/nyatmp_1994
 
 -h, -v,                 print the usage and version.
 
@@ -38,6 +38,7 @@ Current WORKDIR:
 -n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img.
 -k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
 -s "STRING",            specify a superkey. Use STRING as superkey.
+-V,                     verbose mode.
 ```
 
 ---

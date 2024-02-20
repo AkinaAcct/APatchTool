@@ -12,7 +12,7 @@ alias echo="echo -e"
 WORKDIR="/data/local/tmp/nyatmp_${RANDOM}"
 
 # 参数解析
-while getopts ":hvi:k:ns:" OPT; do
+while getopts ":hvi:k:nVs:" OPT; do
 	case $OPT in
 	i) # 处理选项i
 		BOOTPATH="${OPTARG}"
@@ -31,9 +31,14 @@ while getopts ":hvi:k:ns:" OPT; do
 			-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img.
 			-k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
 			-s "STRING",            specify a superkey. Use STRING as superkey.
+			-V,                     verbose mode.
 		EOF
 		echo "${RESET}"
 		exit 0
+		;;
+	V)
+		set -x
+		echo "${YELLOW}W: DEBUG MODE IS ON.${RESET}"
 		;;
 	n)
 		NOINSTALL=true
