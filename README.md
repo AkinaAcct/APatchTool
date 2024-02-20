@@ -1,5 +1,9 @@
 # APatch Auto Patch Tool
 
+A script that provides custom patching options.
+
+---
+
 This script will:
 
 - Obtain the current boot image of your phone.
