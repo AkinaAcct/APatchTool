@@ -84,7 +84,7 @@ patch_boot() { # 修补boot镜像
 		echo "${GREEN}I: Done.${RESET}"
 	fi
 	echo "${BLUE}I: Patching image...Current Superkey: ${SUPERKEY}${RESET}"
-	./kptools-android -p -k kpimg-android -s ${SUPERKEY} -i kernel -o kernel
+	./kptools-android -p -k kpimg-android -s "${SUPERKEY}" -i kernel -o kernel
 	EXITSTATUS=$?
 	if [[ ${EXITSTATUS} != 0 ]]; then
 		echo "${RED}E: PATCH FAILED!${RESET}"
@@ -128,7 +128,7 @@ print_superkey() { # 打印 SUPERKEY
 ####################################
 
 
-    YOUR SUPERKEY IS ${SUPERKEY}
+    YOUR SUPERKEY IS "${SUPERKEY}"
 
     DON'T FORGET IT!!
 

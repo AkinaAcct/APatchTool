@@ -9,6 +9,7 @@ GREEN="\E[1;32m"
 RESET="\E[0m"
 
 alias echo="echo -e"
+WORKDIR="/data/local/tmp/nyatmp_${RANDOM}"
 
 # 参数解析
 while getopts ":hvi:k:ns:" OPT; do
@@ -83,10 +84,8 @@ if [[ -z "${SUPERKEY}" ]]; then
 	SUPERKEY=${RANDOM}
 fi
 
-WORKDIR=/data/adb/nyatmp
-
 # 清理可能存在的上次运行文件
-rm -rf ${WORKDIR}
+rm -rf /data/local/nyatmp_*
 
 mkdir -p ${WORKDIR}
 echo "${BLUE}I: Downloading files from GitHub...${RESET}"
