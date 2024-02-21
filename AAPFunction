@@ -76,7 +76,31 @@ patch_boot() { # 修补boot镜像
 	fi
 	echo "${GREEN}I: Done.${RESET}"
 	echo "${BLUE}I: Unpatching current image...${RESET}"
-	./kptools-android -u -i kernel -o kernel || EXITSTATUS=$?
+	# COMMAND:
+	# -h, --help                       Print this message.
+	#   -v, --version                    Print version number. Print kpimg version if -k specified.
+	#   -p, --patch                      Patch or Update patch of kernel image(-i) with specified kpimg(-k) and superkey(-s).
+	#   -u, --unpatch                    Unpatch patched kernel image(-i).
+	#   -r, --reset-skey                 Reset superkey of patched image(-i).
+	#   -d, --dump                       Dump kallsyms infomations of kernel image(-i).
+	#   -l, --list                       Print all patch informations of kernel image if (-i) specified.
+	#                                    Print extra item informations if (-M) specified.
+	#                                    Print KernelPatch image informations if (-k) specified.
+	# Options:
+	#   -i, --image PATH                 Kernel image path.
+	#   -k, --kpimg PATH                 KernelPatch image path.
+	#   -s, --skey PATH                  Set superkey.
+	#   -o, --out PATH                   Patched image path.
+	#   -a  --addition KEY=VALUE         Add additional information.
+	#   -K, --kpatch PATH                Embed kpatch executable binary into patches.
+	#   -M, --embed-extra-path PATH      Embed new extra item.
+	#   -E, --embeded-extra-name NAME    Preserve and modifiy embedded extra item.
+	#   -T, --extra-type TYPE            Set type of previous extra item.
+	#   -N, --extra-name NAME            Set name of previous extra item.
+	#   -V, --extra-event EVENT          Set trigger event of previous extra item.
+	#   -A, --extra-args ARGS            Set arguments of previous extra item.
+	#   -D, --extra-detach               Detach previous extra item from patches.
+	./kptools-android --unpatch --image kernel --out kernel || EXITSTATUS=$?
 	if [[ ${EXITSTATUS} != 0 ]]; then
 		echo "${YELLOW}I: Maybe you are using stock boot image?${RESET}"
 		echo "${YELLOW}W: Now skipping unpatching...${RESET}"
@@ -84,7 +108,7 @@ patch_boot() { # 修补boot镜像
 		echo "${GREEN}I: Done.${RESET}"
 	fi
 	echo "${BLUE}I: Patching image...Current Superkey: ${SUPERKEY}${RESET}"
-	./kptools-android -p -k kpimg-android -s "${SUPERKEY}" -i kernel -o kernel
+	./kptools-android --patch --kpimg kpimg-android --skey "${SUPERKEY}" --image kernel --out kernel
 	EXITSTATUS=$?
 	if [[ ${EXITSTATUS} != 0 ]]; then
 		echo "${RED}E: PATCH FAILED!${RESET}"
