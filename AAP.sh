@@ -91,8 +91,10 @@ fi
 
 # 清理可能存在的上次运行文件
 rm -rf /data/local/nyatmp_*
+
+# 检测可能存在的APatch app, 并输出相关信息
 if (pm path me.bmax.apatch >/dev/null 2>&1); then
-	echo "${BLUE}I: Detected that APache is installed.${RESET}"
+	echo "${BLUE}I: Detected that APatch is installed.${RESET}"
 	APKPATH="$(command echo $(pm path me.bmax.apatch) | sed 's/base.apk//g' | sed 's/package://g')"
 	APKLIBPATH="${APKPATH}lib/arm64"
 	APDVER="$(${APKLIBPATH}/libapd.so -V)"
@@ -104,7 +106,7 @@ if (pm path me.bmax.apatch >/dev/null 2>&1); then
 fi
 
 mkdir -p ${WORKDIR}
-echo "${BLUE}I: Downloading files from GitHub...${RESET}"
+echo "${BLUE}I: Downloading function file from GitHub...${RESET}"
 curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
 EXITSTATUS=$?
 if [[ $EXITSTATUS != 0 ]]; then
@@ -112,13 +114,13 @@ if [[ $EXITSTATUS != 0 ]]; then
 	exit 1
 fi
 echo "${BLUE}I: Backing up boot image...${RESET}"
-dd if=/dev/block/by-name/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot.img
+dd if=/dev/block/by-name/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
 EXITSTATUS=$?
 if [[ "${EXITSTATUS}" != "0" ]]; then
 	echo "${RED}E: BOOT IMAGE BACKUP FAILED!${RESET}"
 	echo "${YELLOW}W: Now skiping backingup boot image...${RESET}"
 else
-	echo "${GREEN}I: Done. Boot image path: /storage/emulated/0/stock_boot.img${RESET}"
+	echo "${GREEN}I: Done. Boot image path: /storage/emulated/0/stock_boot${BOOTSUFFIX}.img${RESET}"
 fi
 
 # 加载操作文件
