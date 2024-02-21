@@ -129,7 +129,7 @@ source ${WORKDIR}/AAPFunction
 get_device_boot
 get_tools
 patch_boot
-if [[ -n "${NOINSTALL}" ]]; then
+if [[ -n ${NOINSTALL} ]]; then
 	echo "${YELLOW}W: The -n parameter was received. Won't flash the boot partition.${RESET}"
 	echo "${BLUE}I: Now copying patched image to /storage/emulated/0/patched_boot.img...${RESET}"
 	mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
