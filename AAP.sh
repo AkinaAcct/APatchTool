@@ -41,7 +41,7 @@ while getopts ":hvi:k:nVs:" OPT; do
 		echo "${YELLOW}W: DEBUG MODE IS ON.${RESET}"
 		;;
 	n)
-		NOINSTALL=true
+		NOINSTALL="true"
 		echo "${BLUE}I: The -n parameter was received. Won't install after patch.${RESET}"
 		;;
 	s)
@@ -127,8 +127,8 @@ source ${WORKDIR}/AAPFunction
 get_device_boot
 get_tools
 patch_boot
-if ${NOINSTALL}; then
-	echo "${YELLOW}W: The -n parameter was received. Won't flash the boot partition.${RESET}"
+if [[ -n "${NOINSTALL}" ]]; then
+	echo "${YE8LLOW}W: The -n parameter was received. Won't flash the boot partition.${RESET}"
 	echo "${BLUE}I: Now copying patched image to /storage/emulated/0/patched_boot.img...${RESET}"
 	mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
 	rm -rf ${WORKDIR}
