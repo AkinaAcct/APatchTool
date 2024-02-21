@@ -152,7 +152,7 @@ print_superkey() { # 打印 SUPERKEY
 ####################################
 
 
-    YOUR SUPERKEY IS "${SUPERKEY}\
+    YOUR SUPERKEY IS "$(echo "${BLUE}${SUPERKEY}${RESET}")"
 
     DON'T FORGET IT!!
 
