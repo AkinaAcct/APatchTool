@@ -149,7 +149,7 @@ patch_boot
 if [[ -n ${NOINSTALL} ]]; then
 	echo "${YELLOW}W: The -n parameter was received. Won't install patched image.${RESET}"
 	echo "${BLUE}I: Now copying patched image to /storage/emulated/0/patched_boot.img...${RESET}"
-	su -c "mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img"
+	mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
 	rm -rf ${WORKDIR}
 	echo "${GREEN}I: Done.${RESET}"
 elif [[ "${OS}" == "android" ]]; then
