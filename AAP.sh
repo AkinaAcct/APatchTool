@@ -11,6 +11,26 @@ RESET="\E[0m"
 alias echo="echo -e"
 WORKDIR="/data/local/tmp/nyatmp_${RANDOM}"
 
+print_help() {
+	echo "${GREEN}"
+	cat <<-EOF
+		APatch Auto Patch Tool
+		Written by nya
+		Version: 1.0.0
+		Current WORKDIR: ${WORKDIR}
+
+		-h, -v,                 print the usage and version.
+
+		-i [BOOT IMAGE PATH],   specify a boot image path.
+		-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img.
+		-k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
+		-s "STRING",            specify a superkey. Use STRING as superkey.
+		-V,                     verbose mode.
+	EOF
+	echo "${RESET}"
+	exit 0
+}
+
 # 参数解析
 while getopts ":hvi:k:nVs:" OPT; do
 	case $OPT in
@@ -18,23 +38,7 @@ while getopts ":hvi:k:nVs:" OPT; do
 		BOOTPATH="${OPTARG}"
 		;;
 	h | v)
-		echo "${GREEN}"
-		cat <<-EOF
-			APatch Auto Patch Tool
-			Written by nya
-			Version: 1.0.0
-			Current WORKDIR: ${WORKDIR}
-
-			-h, -v,                 print the usage and version.
-
-			-i [BOOT IMAGE PATH],   specify a boot image path.
-			-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img.
-			-k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
-			-s "STRING",            specify a superkey. Use STRING as superkey.
-			-V,                     verbose mode.
-		EOF
-		echo "${RESET}"
-		exit 0
+		print_help
 		;;
 	V)
 		set -x
