@@ -9,7 +9,7 @@ GREEN="\E[1;32m"
 RESET="\E[0m"
 
 alias echo="echo -e"
-WORKDIR="./nyatmp_${RANDOM}"
+WORKDIR="$(pwd)/nyatmp_${RANDOM}"
 
 print_help() {
 	echo "${GREEN}"
