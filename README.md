@@ -51,7 +51,7 @@ Current WORKDIR: /data/local/tmp/nyatmp_1994
 
 - [x] User-specified boot image path.  
 - [x] User-specified Superkey.  
-- [x] Specify KernelPatch version.  
+- [x] User-specified KernelPatch version.  
 - [x] Other terminal software support(e.g. MT).  
 - [x] Linux Support.  
 
