@@ -78,7 +78,7 @@ if [[ "$(id -u)" != "0" ]]; then
 	exit 2
 fi
 # OS 检测
-if ! (command -v getprop >/dev/null 2>&1); then
+if (command -v getprop >/dev/null 2>&1); then
 	OS="android"
 	echo "${BLUE}I: OS: ${OS}${RESET}"
 else
@@ -148,7 +148,7 @@ patch_boot
 if [[ -n ${NOINSTALL} ]]; then
 	echo "${YELLOW}W: The -n parameter was received. Won't install patched image.${RESET}"
 	echo "${BLUE}I: Now copying patched image to /storage/emulated/0/patched_boot.img...${RESET}"
-	mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
+	su -c "mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img"
 	rm -rf ${WORKDIR}
 	echo "${GREEN}I: Done.${RESET}"
 elif [[ "${OS}" == "android" ]]; then
