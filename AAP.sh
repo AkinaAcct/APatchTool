@@ -9,7 +9,6 @@ GREEN="\E[1;32m"
 RESET="\E[0m"
 
 alias echo="echo -e"
-WORKDIR="$(pwd)/nyatmp_${RANDOM}"
 
 print_help() {
 	echo "${GREEN}"
@@ -72,6 +71,8 @@ while getopts ":hvi:k:nVs:" OPT; do
 	esac
 done
 
+# 设置工作文件夹
+WORKDIR="$(pwd)/nyatmp_${RANDOM}"
 # ROOT 检测
 if [[ "$(id -u)" != "0" ]]; then
 	echo "${RED}E: RUN THIS SCRIPT WITH ROOT PERMISSION!${RESET}"
