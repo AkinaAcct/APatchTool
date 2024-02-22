@@ -9,7 +9,7 @@ GREEN="\E[1;32m"
 RESET="\E[0m"
 
 alias echo="echo -e"
-WORKDIR="/data/local/tmp/nyatmp_${RANDOM}"
+WORKDIR="./nyatmp_${RANDOM}"
 
 print_help() {
 	echo "${GREEN}"
@@ -36,6 +36,12 @@ while getopts ":hvi:k:nVs:" OPT; do
 	case $OPT in
 	i) # 处理选项i
 		BOOTPATH="${OPTARG}"
+		if [[ -e "${BOOTPATH}" ]]; then
+			echo "${BLUE}I: Boot image path specified. Current image path: ${BOOTPATH}${RESET}"
+		else
+			echo "${RED}E: SPECIFIED BOOT IMAGE PATH IS WRONG! NO SUCH FILE!${RESET}"
+			exit 1
+		fi
 		;;
 	h | v)
 		print_help
@@ -71,43 +77,45 @@ if [[ "$(id -u)" != "0" ]]; then
 	echo "${RED}E: RUN THIS SCRIPT WITH ROOT PERMISSION!${RESET}"
 	exit 2
 fi
-# Android 检测
+# OS 检测
 if ! (command -v getprop >/dev/null 2>&1); then
-	echo "${RED}E: RUN THIS SCRIPT IN ANDROID/TERMUX!!${RESET}"
-	exit 1
-fi
-# 判断用户输入的boot镜像路径是否正确
-if [[ -n "${BOOTPATH}" ]]; then
-	if [[ -e "${BOOTPATH}" ]]; then
-		echo "${BLUE}I: Boot image path specified. Current boot path: ${BOOTPATH}${RESET}"
-	else
-		echo "${RED}E: SPECIFIED BOOT IMAGE PATH IS WRONG! NO SUCH FILE!${RESET}"
+	OS="android"
+	echo "${BLUE}I: OS: ${OS}${RESET}"
+else
+	OS="linux"
+	echo "${YELLOW}W: You are using ${OS}.Using this script on ${OS} is still under testing.${RESET}"
+	if [[ -z "${BOOTPATH}" ]]; then
+		echo "${RED}E: You are using ${OS}, but there is no image specified by you. Exited.${RESET}"
 		exit 1
 	fi
 fi
 # 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
-if [[ ! -e /dev/block/by-name/boot ]]; then
+if [[ ! -e /dev/block/by-name/boot && "${OS}" == "android" ]]; then
 	BOOTSUFFIX=$(getprop ro.boot.slot_suffix)
+else
+	echo "${BLUE}I: Current OS is: ${OS}. Skip boot slot check.${RESET}"
 fi
+# 判断是否指定SUPERKEY，否则使用$RANDOM作为SUPERKEY
 if [[ -z "${SUPERKEY}" ]]; then
 	SUPERKEY=${RANDOM}
 fi
+# 检测可能存在的APatch app, 并输出相关信息
+if [[ "${OS}" == "android" ]]; then
+	if (pm path me.bmax.apatch >/dev/null 2>&1); then
+		echo "${BLUE}I: Detected that APatch is installed.${RESET}"
+		APKPATH="$(command echo "$(pm path me.bmax.apatch)" | sed 's/base.apk//g' | sed 's/package://g')"
+		APKLIBPATH="${APKPATH}lib/arm64"
+		APDVER="$(${APKLIBPATH}/libapd.so -V)"
+		LKPVER="$(${APKLIBPATH}/libkpatch.so -v)"
+		cat <<-EOF
+			Installed manager(apd) version: $(echo "${BLUE}${APDVER}${RESET}")
+			APatch app built-in KernelPatch version: $(echo "${BLUE}${LKPVER}${RESET}")
+		EOF
+	fi
+fi
 
 # 清理可能存在的上次运行文件
-rm -rf /data/local/nyatmp_*
-
-# 检测可能存在的APatch app, 并输出相关信息
-if (pm path me.bmax.apatch >/dev/null 2>&1); then
-	echo "${BLUE}I: Detected that APatch is installed.${RESET}"
-	APKPATH="$(command echo $(pm path me.bmax.apatch) | sed 's/base.apk//g' | sed 's/package://g')"
-	APKLIBPATH="${APKPATH}lib/arm64"
-	APDVER="$(${APKLIBPATH}/libapd.so -V)"
-	LKPVER="$(${APKLIBPATH}/libkpatch.so -v)"
-	cat <<-EOF
-		Installed manager(apd) version: $(echo "${BLUE}${APDVER}${RESET}")
-		APatch app built-in KernelPatch version: $(echo "${BLUE}${LKPVER}${RESET}")
-	EOF
-fi
+rm -rf ./nyatmp_*
 
 mkdir -p ${WORKDIR}
 echo "${BLUE}I: Downloading function file from GitHub...${RESET}"
@@ -117,14 +125,18 @@ if [[ $EXITSTATUS != 0 ]]; then
 	echo "${RED}E: SOMETHING WENT WRONG! CHECK YOUR INTERNET CONNECTION!${RESET}"
 	exit 1
 fi
-echo "${BLUE}I: Backing up boot image...${RESET}"
-dd if=/dev/block/by-name/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
-EXITSTATUS=$?
-if [[ "${EXITSTATUS}" != "0" ]]; then
-	echo "${RED}E: BOOT IMAGE BACKUP FAILED!${RESET}"
-	echo "${YELLOW}W: Now skiping backingup boot image...${RESET}"
+if [[ "${OS}" == "android" ]]; then
+	echo "${BLUE}I: Backing up boot image...${RESET}"
+	dd if=/dev/block/by-name/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
+	EXITSTATUS=$?
+	if [[ "${EXITSTATUS}" != "0" ]]; then
+		echo "${RED}E: BOOT IMAGE BACKUP FAILED!${RESET}"
+		echo "${YELLOW}W: Now skiping backingup boot image...${RESET}"
+	else
+		echo "${GREEN}I: Done. Boot image path: /storage/emulated/0/stock_boot${BOOTSUFFIX}.img${RESET}"
+	fi
 else
-	echo "${GREEN}I: Done. Boot image path: /storage/emulated/0/stock_boot${BOOTSUFFIX}.img${RESET}"
+	echo "${BLUE}I: Current OS: ${OS}. Skiping backup...${RESET}"
 fi
 
 # 加载操作文件
@@ -134,11 +146,13 @@ get_device_boot
 get_tools
 patch_boot
 if [[ -n ${NOINSTALL} ]]; then
-	echo "${YELLOW}W: The -n parameter was received. Won't flash the boot partition.${RESET}"
+	echo "${YELLOW}W: The -n parameter was received. Won't install patched image.${RESET}"
 	echo "${BLUE}I: Now copying patched image to /storage/emulated/0/patched_boot.img...${RESET}"
 	mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
 	rm -rf ${WORKDIR}
 	echo "${GREEN}I: Done.${RESET}"
+elif [[ "${OS}" == "android" ]]; then
+	echo "${BLUE}I: Current OS is: ${OS}. Won't install patched image.${RESET}"
 else
 	flash_boot
 fi
