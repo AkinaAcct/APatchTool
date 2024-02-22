@@ -53,6 +53,7 @@ Current WORKDIR: /data/local/tmp/nyatmp_1994
 - [x] User-specified Superkey.  
 - [x] Specify KernelPatch version.  
 - [ ] Other terminal software support(e.g. MT).  
+- [ ] Linux Support.  
 
 ---
 
