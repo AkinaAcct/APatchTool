@@ -4,12 +4,12 @@ A script that provides custom patching options.
 
 ---
 
-This script will:
+This script has the following functions:
 
-- Obtain the current boot image of your phone.
-- Download the latest KernelPatch and magiskboot from GitHub Release.
-- Patch the extracted boot image.
-- Flash the patched image.
+- User-specified image path or get from current Android device.  
+- User-specified KernelPatch version. Or default, latest release.  
+- User-specified SuperKey.[What is SuperKey?](https://github.com/bmax121/APatch/blob/main/docs/en/faq.md#what-is-superkey)  
+- Only patch but not install support.
 
 ---
 
@@ -34,7 +34,6 @@ Usage:
 APatch Auto Patch Tool
 Written by nya
 Version: 1.0.0
-Current WORKDIR: /data/local/tmp/nyatmp_1994
 
 -h, -v,                 print the usage and version.
 

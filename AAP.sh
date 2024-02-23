@@ -16,7 +16,7 @@ print_help() {
 		APatch Auto Patch Tool
 		Written by nya
 		Version: 1.0.0
-		        Current DIR: $(pwd)
+		Current DIR: $(pwd)
 
 		-h, -v,                 print the usage and version.
 
