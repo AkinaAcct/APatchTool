@@ -1,4 +1,4 @@
-#!/system/bin/sh
+#!/bin/env sh
 #by nya
 #2024-02-06
 
