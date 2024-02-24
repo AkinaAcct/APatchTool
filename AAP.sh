@@ -21,7 +21,7 @@ print_help() {
 		-h, -v,                 print the usage and version.
 
 		-i [BOOT IMAGE PATH],   specify a boot image path.
-		-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img.
+		-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img, or on Linux ${HOME}/patched_boot.img.
 		-k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
 		-s "STRING",            specify a superkey. Use STRING as superkey.
 		-V,                     verbose mode.
@@ -148,12 +148,17 @@ get_tools
 patch_boot
 if [[ -n ${NOINSTALL} ]]; then
 	echo "${YELLOW}W: The -n parameter was received. Won't install patched image.${RESET}"
-	echo "${BLUE}I: Now copying patched image to /storage/emulated/0/patched_boot.img...${RESET}"
-	mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
+	if [[ "${OS}" == "android" ]]; then
+		echo "${BLUE}I: Now copying patched image to /storage/emulated/0/patched_boot.img...${RESET}"
+		mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
+	else
+		echo "${BLUE}I: Now copying patched image to ${HOME}/patched_boot.img...${RESET}"
+		mv ${WORKDIR}/new-boot.img ${HOME}/patched_boot.img
+	fi
 	echo "${BLUE}I: Done. Now deleting tmp files...${RESET}"
 	rm -rf ${WORKDIR}
 	echo "${GREEN}I: Done.${RESET}"
-elif [[ "${OS}" == "android" ]]; then
+elif [[ "${OS}" != "android" ]]; then
 	echo "${BLUE}I: Current OS is: ${OS}. Won't install patched image.${RESET}"
 else
 	flash_boot
