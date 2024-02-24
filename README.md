@@ -2,6 +2,8 @@
 
 A script that provides custom patching options.
 
+[中文](./README_CN.md)
+
 ---
 
 This script has the following functions:
