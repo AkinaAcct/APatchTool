@@ -31,7 +31,7 @@ print_help() {
 }
 
 # 参数解析
-while getopts ":hvi:k:nVs:" OPT; do
+while getopts ":hvi:k:nVs:S" OPT; do
 	case $OPT in
 	i) # 处理选项i
 		BOOTPATH="${OPTARG}"
@@ -44,6 +44,10 @@ while getopts ":hvi:k:nVs:" OPT; do
 		;;
 	h | v)
 		print_help
+		;;
+	S)
+		SAVEROOT="true"
+		echo "${BLUE}I: The -S parameter was received. The patched image will be flashed into another slot if this is a ab partition device."
 		;;
 	V)
 		set -x
@@ -96,7 +100,14 @@ if [[ ! -e /dev/block/by-name/boot && "${OS}" == "android" ]]; then
 else
 	echo "${BLUE}I: Current OS is: ${OS}. Skip boot slot check.${RESET}"
 fi
-# 判断是否指定SUPERKEY，否则使用$RANDOM作为SUPERKEY
+if [[ -n "${SAVEROOT}" && -n "${BOOTSUFFIX}" && "${OS}" == "android" ]]; then
+	if [[ "${BOOTSUFFIX}" == "_a" ]]; then
+		TBOOTSUFFIX="_b"
+	else
+		TBOOTSUFFIX="_a"
+	fi
+	echo "${BLUE}I: You have specified the installation to another slot. Current slot:${BOOTSUFFIX}. Slot to be flashed into:${TBOOTSUFFIX}."
+fi
 if [[ -z "${SUPERKEY}" ]]; then
 	SUPERKEY=${RANDOM}
 fi
@@ -119,6 +130,7 @@ fi
 rm -rf ./nyatmp_*
 
 mkdir -p ${WORKDIR}
+
 echo "${BLUE}I: Downloading function file from GitHub...${RESET}"
 curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
 EXITSTATUS=$?
@@ -126,6 +138,8 @@ if [[ $EXITSTATUS != 0 ]]; then
 	echo "${RED}E: SOMETHING WENT WRONG! CHECK YOUR INTERNET CONNECTION!${RESET}"
 	exit 1
 fi
+
+# 备份boot
 if [[ "${OS}" == "android" ]]; then
 	echo "${BLUE}I: Backing up boot image...${RESET}"
 	dd if=/dev/block/by-name/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
