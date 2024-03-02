@@ -36,13 +36,15 @@ Usage:
 APatch Auto Patch Tool
 Written by nya
 Version: 1.0.0
+Current DIR: /home/nya/APatchAutoPatchTool
 
 -h, -v,                 print the usage and version.
 
 -i [BOOT IMAGE PATH],   specify a boot image path.
--n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img, or on Linux, ${HOME}/patched_boot.img.
+-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img, or on Linux /home/nya/patched_boot.img.
 -k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
 -s "STRING",            specify a superkey. Use STRING as superkey.
+-S,                     Install to another slot (for OTA).
 -V,                     verbose mode.
 ```
 
