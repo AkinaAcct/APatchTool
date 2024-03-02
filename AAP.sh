@@ -1,4 +1,4 @@
-#!/bin/env sh
+#!/bin/sh
 #by nya
 #2024-02-06
 
@@ -24,6 +24,7 @@ print_help() {
 		-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img, or on Linux ${HOME}/patched_boot.img.
 		-k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
 		-s "STRING",            specify a superkey. Use STRING as superkey.
+		-S,                     Install to another slot (for OTA).
 		-V,                     verbose mode.
 	EOF
 	echo "${RESET}"

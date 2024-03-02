@@ -131,7 +131,7 @@ flash_boot() { # 刷入boot镜像
 	if [[ "${OS}" != "linux" ]]; then
 		echo "${BLUE}I: Flashing boot image...${RESET}"
 		if [[ -n "${TBOOTSUFFIX}" ]]; then
-			echo "${BLUE}I: You previously specified that you want to install to another slot. Target slot:${TBOOTSUFFIX}$"
+			echo "${BLUE}I: You previously specified that you want to install to another slot. Target slot:${TBOOTSUFFIX}."
 			BOOTSUFFIX=${TBOOTSUFFIX}
 		fi
 		dd if=${WORKDIR}/new-boot.img of=/dev/block/by-name/boot${BOOTSUFFIX}
