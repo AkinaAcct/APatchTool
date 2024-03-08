@@ -96,7 +96,8 @@ else
 	fi
 fi
 # 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
-if [[ ! -e /dev/block/by-name/boot && "${OS}" == "android" ]]; then
+BYNAMEPATH="$(getprop ro.frp.pst | sed 's/frp//g')"
+if [[ ! -e ${BYNAMEPATH}/boot && "${OS}" == "android" ]]; then
 	BOOTSUFFIX=$(getprop ro.boot.slot_suffix)
 else
 	echo "${BLUE}I: Current OS is: ${OS}. Skip boot slot check.${RESET}"
@@ -143,7 +144,7 @@ fi
 # 备份boot
 if [[ "${OS}" == "android" ]]; then
 	echo "${BLUE}I: Backing up boot image...${RESET}"
-	dd if=/dev/block/by-name/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
+	dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
 	EXITSTATUS=$?
 	if [[ "${EXITSTATUS}" != "0" ]]; then
 		echo "${RED}E: BOOT IMAGE BACKUP FAILED!${RESET}"

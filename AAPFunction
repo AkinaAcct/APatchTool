@@ -6,7 +6,7 @@ get_device_boot() { # 未指定boot路径时从设备boot分区获取boot镜像
 	echo "${BLUE}I: Getting boot image...${RESET}"
 	if [[ -z "${BOOTPATH}" ]]; then
 		echo "${BLUE}I: Current boot: ${BOOTSUFFIX}(If empty: A-Only devices)${RESET}"
-		dd if=/dev/block/by-name/boot${BOOTSUFFIX} of=${WORKDIR}/boot${BOOTSUFFIX}.img
+		dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=${WORKDIR}/boot${BOOTSUFFIX}.img
 		EXITSTATUS=$?
 		if [[ $EXITSTATUS != 0 ]]; then
 			echo "${RED}E: GET BOOT IMAGE FAILED${RESET}"
@@ -134,12 +134,12 @@ flash_boot() { # 刷入boot镜像
 			echo "${BLUE}I: You previously specified that you want to install to another slot. Target slot:${TBOOTSUFFIX}."
 			BOOTSUFFIX=${TBOOTSUFFIX}
 		fi
-		dd if=${WORKDIR}/new-boot.img of=/dev/block/by-name/boot${BOOTSUFFIX}
+		dd if=${WORKDIR}/new-boot.img of=${BYNAMEPATH}/boot${BOOTSUFFIX}
 		EXITSTATUS=$?
 		if [[ ${EXITSTATUS} != 0 ]]; then
 			echo "${RED}E: WARNING!!! IMAGE FLASH FAILED${RESET}"
 			echo "${YELLOW}I: Now trying to restore...${RESET}"
-			dd if=${WORKDIR}/boot${BOOTSUFFIX}.img of=/dev/block/by-name/boot${BOOTSUFFIX}
+			dd if=${WORKDIR}/boot${BOOTSUFFIX}.img of=${BYNAMEPATH}/boot${BOOTSUFFIX}
 			EXITSTATUS=$?
 			if [[ ${EXITSTATUS} != 0 ]]; then
 				echo "${RED}E: WARNING!!! RESTORE FAILED!!!"
