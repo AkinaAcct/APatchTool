@@ -96,7 +96,7 @@ else
 	fi
 fi
 # 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
-BYNAMEPATH="$(getprop ro.frp.pst | sed 's/frp//g')"
+BYNAMEPATH="$(getprop ro.frp.pst | sed 's/\/frp//g')"
 if [[ ! -e ${BYNAMEPATH}/boot && "${OS}" == "android" ]]; then
 	BOOTSUFFIX=$(getprop ro.boot.slot_suffix)
 else
