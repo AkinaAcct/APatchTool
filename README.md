@@ -1,11 +1,3 @@
-**Since APatch APP already supports in-APP upgrades, this project has lost its meaning. Perhaps the biggest benefit is custom KernelPatch patching, but this feature is very stable and requires no maintenance.**
-
-**Well, then it's time to say goodbye.**
-
-## **EOL**
-
----
-
 # APatch Auto Patch Tool
 
 A script that provides custom patching options.
