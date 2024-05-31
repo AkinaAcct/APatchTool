@@ -13,26 +13,27 @@ alias echo="echo -e"
 print_help() {
 	echo "${GREEN}"
 	cat <<-EOF
-		APatch Auto Patch Tool
-		Written by nya
-		Version: 1.0.0
-		Current DIR: $(pwd)
+APatch Auto Patch Tool
+Written by nya
+Version: 1.0.1
+Current DIR: $(pwd)
 
-		-h, -v,                 print the usage and version.
+-h, -v,                 print the usage and version.
 
-		-i [BOOT IMAGE PATH],   specify a boot image path.
-		-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img, or on Linux ${HOME}/patched_boot.img.
-		-k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
-		-s "STRING",            specify a superkey. Use STRING as superkey.
-		-S,                     Install to another slot (for OTA).
-		-V,                     verbose mode.
+-i [BOOT IMAGE PATH],   specify a boot image path.
+-n,                     do not install the patched boot image, save the image in /storage/emulated/0/patched_boot.img, or on Linux ${HOME}/patched_boot.img.
+-k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
+-s "STRING",            specify a superkey. Use STRING as superkey.
+-S,                     Install to another slot (for OTA).
+-E [ARGS],              Add args [ARGS] to kptools when patching.
+-V,                     verbose mode.
 	EOF
 	echo "${RESET}"
 	exit 0
 }
 
 # 参数解析
-while getopts ":hvi:k:nVs:S" OPT; do
+while getopts ":hvi:k:nVs:SE:" OPT; do
 	case $OPT in
 	i) # 处理选项i
 		BOOTPATH="${OPTARG}"
@@ -66,6 +67,10 @@ while getopts ":hvi:k:nVs:S" OPT; do
 		KPTOOLVER="${OPTARG}"
 		echo "${BLUE}I: The -k parameter was received. Will use kptool ${KPTOOLVER}.${RESET}"
 		;;
+  E)
+    EXTRAARGS="${OPTARG}"
+    echo "${BLUE}I: The -E parameter was received. Current extra args: ${EXTRAARGS}"
+    ;;
 	:)
 		echo "${YELLOW}W: Option -$OPTARG requires an argument..${RESET}" >&2 && exit 1
 		;;
