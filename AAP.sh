@@ -14,7 +14,7 @@ print_help() {
 	echo "${GREEN}"
 	cat <<-EOF
 APatch Auto Patch Tool
-Written by nya
+Written by Akina
 Version: 1.0.1
 Current DIR: $(pwd)
 

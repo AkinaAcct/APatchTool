@@ -10,7 +10,7 @@ This script has the following functions:
 
 - User-specified image path or get from current Android device.  
 - User-specified KernelPatch version. Or default, latest release.  
-- User-specified SuperKey.[What is SuperKey?](https://github.com/bmax121/APatch/blob/main/docs/en/faq.md#what-is-superkey)  
+- User-specified SuperKey.[What is SuperKey?](https://apatch.top/faq.html#what-is-superkey) 
 - Only patch but not install support.
 
 ---
@@ -34,7 +34,7 @@ chmod +x AAP.sh
 Usage:
 ```text
 APatch Auto Patch Tool
-Written by nya
+Written by Akina
 Version: 1.0.1
 Current DIR: $(pwd)
 
