@@ -14,7 +14,7 @@ jobs:
           disable_web_page_preview: true
           message: |
             New push to Github!
-            ```
+            ```text
             ${{ github.event.commits[0].message }}
             ```By `${{ github.actor }}` in repo `${{ github.repository }}`
             
