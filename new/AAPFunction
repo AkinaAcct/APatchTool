@@ -92,7 +92,7 @@ patch_boot() { # 修补boot镜像
 	fi
 	log_info "Done."
 	log_info "Repacking..."
-	./magiskboot repack boot${BOOTSUFFIX}.img patched_boot.img
+	./magiskboot repack boot${BOOTSUFFIX}.img
 	EXITSTATUS=$?
 	if [[ $EXITSTATUS != 0 ]]; then
 		log_err "REPACK FAILED!"
