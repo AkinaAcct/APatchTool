@@ -23,7 +23,7 @@ This script has the following functions:
 
 ```bash
 cd ${HOME}
-curl -LO https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/new/AAP.sh
+curl -LO https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/new/AAP-New.sh
 chmod +x AAP.sh
 ```
 
