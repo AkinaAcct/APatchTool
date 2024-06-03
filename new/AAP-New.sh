@@ -17,7 +17,9 @@ log_err() {
 log_warn() {
 	echo -e "${YELLOW}[WARN] $(date "+%H:%M:%S"): $1${RESET}"
 }
-
+if [[ $(id -u) -nq 0 ]]; then
+	log_err "Run this script with root!"
+fi
 print_help() {
 	echo -e "${GREEN}"
 	cat <<-EOF
