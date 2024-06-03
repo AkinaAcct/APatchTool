@@ -144,6 +144,7 @@ fi
 
 # 清理可能存在的上次运行文件
 rm -rf /tmp/LuoYanTmp_*
+rm -rf ./LuoYanTmp_*
 mkdir -p "${WORKDIR}"
 
 log_info "Downloading function file from GitHub..."
@@ -179,7 +180,7 @@ if [[ -n ${NOINSTALL} ]]; then
 	log_warn "The -n parameter was received. Won't install patched image."
 	if [[ "${OS}" == "android" ]]; then
 		log_info "Now copying patched image to /storage/emulated/0/patched_boot.img..."
-		mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
+		mv ${WORKDIR}/patched_boot.img /storage/emulated/0/patched_boot.img
 	else
 		log_info "Now copying patched image to ${HOME}/patched_boot.img..."
 		mv ${WORKDIR}/new-boot.img ${HOME}/patched_boot.img

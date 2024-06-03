@@ -1,6 +1,6 @@
 #!/bin/env bash
-#by nya
-#2024-02-04
+#by Akina
+#2024-06-03
 
 get_device_boot() { # 未指定boot路径时从设备boot分区获取boot镜像
 	log_info "Getting boot image..."
@@ -55,7 +55,7 @@ get_tools() { # 从GitHub下载工具
 	fi
 	log_info "Done."
 	log_info "Downloading magiskboot..."
-	curl -LO --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/bin/magiskboot"
+	curl -LO --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/bin/magiskboot"
 	EXITSTATUS=$?
 	if [[ $EXITSTATUS != 0 ]]; then
 		log_err "DOWNLOAD FAILED!"
@@ -92,11 +92,11 @@ patch_boot() { # 修补boot镜像
 	fi
 	log_info "Done."
 	log_info "Repacking..."
-	./magiskboot repack boot${BOOTSUFFIX}.img
+	./magiskboot repack boot${BOOTSUFFIX}.img patched_boot.img
 	EXITSTATUS=$?
 	if [[ $EXITSTATUS != 0 ]]; then
 		log_err "REPACK FAILED!"
-		exit 1 t
+		exit 1
 	fi
 	log_info "Done. Finished paching."
 }
