@@ -2,9 +2,7 @@
 
 A script that provides custom patching options.
 > [!NOTE]
-> You can also try the [new version](/new)
-
-[中文](./README_CN.md)
+> This is the `new` folder, which means that the new version of APatch Auto Patch Tool is stored here.
 
 ---
 
@@ -19,13 +17,13 @@ This script has the following functions:
 
 ## Usage
 
-- Open Termux
+- Open Termux(or MT terminal,etc.)
 
 - Prepare
 
 ```bash
 cd ${HOME}
-curl -LO https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/AAP.sh
+curl -LO https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/new/AAP.sh
 chmod +x AAP.sh
 ```
 
@@ -37,7 +35,7 @@ Usage:
 ```text
 APatch Auto Patch Tool
 Written by Akina
-Version: 1.0.1
+Version: 2.0.0
 Current DIR: $(pwd)
 
 -h, -v,                 print the usage and version.
@@ -63,8 +61,7 @@ Current DIR: $(pwd)
 
 ---
 
-
-If you encounter any issues, please submit a issue on github or provide feedback to me: [Telegram](https://t.me/RhineNya)
+If you encounter any issues, please submit a issue on github.
 
 ---
 
