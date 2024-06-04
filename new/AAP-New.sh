@@ -17,10 +17,6 @@ log_err() {
 log_warn() {
 	echo -e "${YELLOW}[WARN] $(date "+%H:%M:%S"): $1${RESET}"
 }
-if [[ $(id -u) -ne 0 ]]; then
-	log_err "Run this script with root!"
-	exit 127
-fi
 print_help() {
 	echo -e "${GREEN}"
 	cat <<-EOF
@@ -92,6 +88,11 @@ while getopts ":hvi:k:nVs:SE:" OPT; do
 	esac
 done
 
+# ROOT 检测
+if [[ $(id -u) -ne 0 ]]; then
+	log_err "Run this script with root!"
+	exit 127
+fi
 # OS 检测
 if (command -v getprop >/dev/null 2>&1); then
 	OS="android"
