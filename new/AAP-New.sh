@@ -19,6 +19,7 @@ log_warn() {
 }
 if [[ $(id -u) -ne 0 ]]; then
 	log_err "Run this script with root!"
+	exit 127
 fi
 print_help() {
 	echo -e "${GREEN}"
