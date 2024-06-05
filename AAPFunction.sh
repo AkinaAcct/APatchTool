@@ -3,28 +3,28 @@
 #2024-06-03
 
 get_device_boot() { # 未指定boot路径时从设备boot分区获取boot镜像
-	log_info "Getting boot image..."
+	msg_info "Getting boot image..."
 	if [[ -z "${BOOTPATH}" ]]; then
-		log_info "Current boot: ${BOOTSUFFIX}(If empty: A-Only devices)"
+		msg_info "Current boot: ${BOOTSUFFIX}(If empty: A-Only devices)"
 		dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=${WORKDIR}/boot${BOOTSUFFIX}.img
 		EXITSTATUS=$?
 		if [[ $EXITSTATUS != 0 ]]; then
-			log_err "GET BOOT IMAGE FAILED!"
+			msg_err "GET BOOT IMAGE FAILED!"
 			exit 1
 		fi
 	else
 		cp ${BOOTPATH} ${WORKDIR}/boot${BOOTSUFFIX}.img
 	fi
-	log_info "Done."
+	msg_info "Done."
 }
 
 get_tools() { # 从GitHub下载工具
 	cd ${WORKDIR} || exit 1
-	log_info "Downloading kptools-${OS}..."
+	msg_info "Downloading kptools-${OS}..."
 	if [[ -n "${KPTOOLVER}" ]]; then
-		log_info "Use the specified version: ${KPTOOLVER}"
+		msg_info "Use the specified version: ${KPTOOLVER}"
 	else
-		log_info "Use the latest kptools."
+		msg_info "Use the latest kptools."
 	fi
 	if [[ -n "${KPTOOLVER}" ]]; then
 		curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/download/${KPTOOLVER}/kptools-${OS}"
@@ -34,13 +34,13 @@ get_tools() { # 从GitHub下载工具
 		EXITSTATUS=$?
 	fi
 	if [[ $EXITSTATUS != 0 ]]; then
-		log_err "DOWNLOAD FAILED!"
-		log_err "Please check your internet connection."
+		msg_err "DOWNLOAD FAILED!"
+		msg_err "Please check your internet connection."
 		exit 1
 	fi
 	chmod +x kptools-${OS}
-	log_info "Done."
-	log_info "Downloading kpimg-android..."
+	msg_info "Done."
+	msg_info "Downloading kpimg-android..."
 	if [[ -n "${KPTOOLVER}" ]]; then
 		curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/download/${KPTOOLVER}/kpimg-android"
 		EXITSTATUS=$?
@@ -49,85 +49,85 @@ get_tools() { # 从GitHub下载工具
 		EXITSTATUS=$?
 	fi
 	if [[ $EXITSTATUS != 0 ]]; then
-		log_err "DOWNLOAD FAILED!"
-		log_err "Please check your internet connection."
+		msg_err "DOWNLOAD FAILED!"
+		msg_err "Please check your internet connection."
 		exit 1
 	fi
-	log_info "Done."
-	log_info "Downloading magiskboot..."
+	msg_info "Done."
+	msg_info "Downloading magiskboot..."
 	curl -LO --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/bin/magiskboot"
 	EXITSTATUS=$?
 	if [[ $EXITSTATUS != 0 ]]; then
-		log_err "DOWNLOAD FAILED!"
-		log_err "Please check your internet connection."
+		msg_err "DOWNLOAD FAILED!"
+		msg_err "Please check your internet connection."
 		exit 1
 	fi
 	chmod +x magiskboot
-	log_info "Done."
+	msg_info "Done."
 }
 
 patch_boot() { # 修补boot镜像
-	log_info "Unpacking image..."
+	msg_info "Unpacking image..."
 	./magiskboot unpack boot${BOOTSUFFIX}.img
 	EXITSTATUS=$?
 	if [[ $EXITSTATUS != 0 ]]; then
-		log_err "UNPACK BOOT IMAGE FAILED!"
+		msg_err "UNPACK BOOT IMAGE FAILED!"
 		exit 1
 	fi
-	log_info "Done."
-	log_info "Unpatching current image..."
+	msg_info "Done."
+	msg_info "Unpatching current image..."
 	./kptools-${OS} --unpatch --image kernel --out kernel || EXITSTATUS=$?
 	if [[ ${EXITSTATUS} != 0 ]]; then
-		log_warn "Unpatch failed. Maybe you are using a unpatched boot image?"
-		log_warn "Now skipping unpatching..."
+		msg_warn "Unpatch failed. Maybe you are using a unpatched boot image?"
+		msg_warn "Now skipping unpatching..."
 	else
-		log_warn "Done."
+		msg_warn "Done."
 	fi
-	log_info "Patching image...Current Superkey: ${SUPERKEY}"
+	msg_info "Patching image...Current Superkey: ${SUPERKEY}"
 	./kptools-${OS} --patch --kpimg kpimg-android --skey "${SUPERKEY}" --image kernel --out kernel ${EXTRAARGS}
 	EXITSTATUS=$?
 	if [[ ${EXITSTATUS} != 0 ]]; then
-		log_err "PATCH FAILED!"
+		msg_err "PATCH FAILED!"
 		exit 1
 	fi
-	log_info "Done."
-	log_info "Repacking..."
+	msg_info "Done."
+	msg_info "Repacking..."
 	./magiskboot repack boot${BOOTSUFFIX}.img
 	EXITSTATUS=$?
 	if [[ $EXITSTATUS != 0 ]]; then
-		log_err "REPACK FAILED!"
+		msg_err "REPACK FAILED!"
 		exit 1
 	fi
-	log_info "Done. Finished paching."
+	msg_info "Done. Finished paching."
 }
 
 flash_boot() { # 刷入boot镜像
 	if [[ "${OS}" == "android" ]]; then
-		log_info "Flashing boot image..."
+		msg_info "Flashing boot image..."
 		if [[ -n "${TBOOTSUFFIX}" ]]; then
-			log_warn "You previously specified that you want to install to another slot. Target slot:${TBOOTSUFFIX}."
+			msg_warn "You previously specified that you want to install to another slot. Target slot:${TBOOTSUFFIX}."
 			BOOTSUFFIX=${TBOOTSUFFIX}
 		fi
 		dd if=${WORKDIR}/new-boot.img of=${BYNAMEPATH}/boot${BOOTSUFFIX}
 		EXITSTATUS=$?
 		if [[ ${EXITSTATUS} != 0 ]]; then
-			log_err "WARNING! IMAGE FLASH FAILED!"
-			log_err "Now trying to restore..."
+			msg_err "WARNING! IMAGE FLASH FAILED!"
+			msg_err "Now trying to restore..."
 			dd if=${WORKDIR}/boot${BOOTSUFFIX}.img of=${BYNAMEPATH}/boot${BOOTSUFFIX}
 			EXITSTATUS=$?
 			if [[ ${EXITSTATUS} != 0 ]]; then
-				log_err "WARNING!!! RESTORE FAILED!!!"
-				log_err "Even I can't help you now. You can try to restore boot manually."
+				msg_err "WARNING!!! RESTORE FAILED!!!"
+				msg_err "Even I can't help you now. You can try to restore boot manually."
 				exit 1
 			fi
-			log_info "Restore Sucessfully."
+			msg_info "Restore Sucessfully."
 		fi
-		log_info "Flash done."
-		log_info "Cleaning temporary files..."
+		msg_info "Flash done."
+		msg_info "Cleaning temporary files..."
 		rm -rf ${WORKDIR}
-		log_info "Done."
+		msg_info "Done."
 	else
-		log_err "You are trying to change this script. Linux does not require a flashing step. This is the second level of warning."
+		msg_err "You are trying to change this script. Linux does not require a flashing step. This is the second level of warning."
 		exit 1
 	fi
 }

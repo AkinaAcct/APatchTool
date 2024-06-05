@@ -8,21 +8,21 @@ BLUE="\E[1;34m"
 GREEN="\E[1;32m"
 RESET="\E[0m"
 LUOYANRANDOM="$(date "+%N")"
-log_info() {
+msg_info() {
 	echo -e "${BLUE}[INFO] $(date "+%H:%M:%S"): $1${RESET}"
 }
-log_err() {
+msg_err() {
 	echo -e "${RED}[ERROR] $(date "+%H:%M:%S"): $1${RESET}"
 }
-log_warn() {
+msg_warn() {
 	echo -e "${YELLOW}[WARN] $(date "+%H:%M:%S"): $1${RESET}"
 }
 if (command -v getprop >/dev/null 2>&1); then
 	OS="android"
-	log_info "OS: ${OS}"
+	msg_info "OS: ${OS}"
 else
 	OS="linux"
-	log_warn "You are using ${OS}. Using this script on ${OS} is still under testing."
+	msg_warn "You are using ${OS}. Using this script on ${OS} is still under testing."
 fi
 
 print_help() {
@@ -53,9 +53,9 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
 	i) # 处理选项i
 		BOOTPATH="${OPTARG}"
 		if [[ -e "${BOOTPATH}" ]]; then
-			log_info "Boot image path specified. Current image path: ${BOOTPATH}"
+			msg_info "Boot image path specified. Current image path: ${BOOTPATH}"
 		else
-			log_err "SPECIFIED BOOT IMAGE PATH IS WRONG! NO SUCH FILE!"
+			msg_err "SPECIFIED BOOT IMAGE PATH IS WRONG! NO SUCH FILE!"
 			exit 1
 		fi
 		;;
@@ -64,51 +64,51 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
 		;;
 	S)
 		SAVEROOT="true"
-		log_info "The -S parameter was received. The patched image will be flashed into another slot if this is a ab partition device."
+		msg_info "The -S parameter was received. The patched image will be flashed into another slot if this is a ab partition device."
 		;;
 	V)
 		set -x
-		log_warn "DEBUG MODE IS ON."
+		msg_warn "DEBUG MODE IS ON."
 		;;
 	I)
 		if [[ "${OS}" == "android" ]]; then
 			INSTALL="true"
-			log_info "The -I parameter was received. Will install after patching."
+			msg_info "The -I parameter was received. Will install after patching."
 		else
-			log_err "Do not use this arg without Android!"
+			msg_err "Do not use this arg without Android!"
 			exit 1
 		fi
 		;;
 	s)
 		SUPERKEY="${OPTARG}"
-		log_info "The -s parameter was received. Currently specified SuperKey: ${SUPERKEY}."
+		msg_info "The -s parameter was received. Currently specified SuperKey: ${SUPERKEY}."
 		;;
 	k)
 		KPTOOLVER="${OPTARG}"
-		log_info "The -k parameter was received. Will use kptool ${KPTOOLVER}."
+		msg_info "The -k parameter was received. Will use kptool ${KPTOOLVER}."
 		;;
 	E)
 		EXTRAARGS="${OPTARG}"
-		log_info "The -E parameter was received. Current extra args: ${EXTRAARGS}"
+		msg_info "The -E parameter was received. Current extra args: ${EXTRAARGS}"
 		;;
 	:)
-		log_err "Option -${OPTARG} requires an argument.." >&2 && exit 1
+		msg_err "Option -${OPTARG} requires an argument.." >&2 && exit 1
 		;;
 
 	?)
-		log_err "Invalid option: -${OPTARG}" >&2 && exit 1
+		msg_err "Invalid option: -${OPTARG}" >&2 && exit 1
 		;;
 	esac
 done
 
 # ROOT 检测
 if [[ $(id -u) -ne 0 ]]; then
-	log_err "Run this script with root!"
+	msg_err "Run this script with root!"
 	exit 127
 fi
 # 镜像路径检测(For Linux)
 if [[ $"${OS}" == "linux" && -z "${BOOTPATH}" ]]; then
-	log_err "You are using ${OS}, but there is no image specified by you. Exited."
+	msg_err "You are using ${OS}, but there is no image specified by you. Exited."
 	exit 1
 fi
 # 设置工作文件夹
@@ -124,7 +124,7 @@ if [[ "${OS}" == "android" ]]; then
 		BOOTSUFFIX=$(getprop ro.boot.slot_suffix)
 	fi
 else
-	log_warn "Current OS is: ${OS}. Skip boot slot check."
+	msg_warn "Current OS is: ${OS}. Skip boot slot check."
 fi
 if [[ -n "${SAVEROOT}" && -n "${BOOTSUFFIX}" && "${OS}" == "android" ]]; then
 	if [[ "${BOOTSUFFIX}" == "_a" ]]; then
@@ -132,7 +132,7 @@ if [[ -n "${SAVEROOT}" && -n "${BOOTSUFFIX}" && "${OS}" == "android" ]]; then
 	else
 		TBOOTSUFFIX="_a"
 	fi
-	log_warn "You have specified the installation to another slot. Current slot:${BOOTSUFFIX}. Slot to be flashed into:${TBOOTSUFFIX}."
+	msg_warn "You have specified the installation to another slot. Current slot:${BOOTSUFFIX}. Slot to be flashed into:${TBOOTSUFFIX}."
 fi
 if [[ -z "${SUPERKEY}" ]]; then
 	SUPERKEY=${LUOYANRANDOM}
@@ -140,7 +140,7 @@ fi
 # 检测可能存在的APatch app, 并输出相关信息
 if [[ "${OS}" == "android" ]]; then
 	if (pm path me.bmax.apatch >/dev/null 2>&1); then
-		log_info "Detected that APatch is installed."
+		msg_info "Detected that APatch is installed."
 		APKPATH="$(command echo "$(pm path me.bmax.apatch)" | sed 's/base.apk//g' | sed 's/package://g')"
 		APKLIBPATH="${APKPATH}lib/arm64"
 		APDVER="$(${APKLIBPATH}/libapd.so -V)"
@@ -157,27 +157,27 @@ rm -rf /tmp/LuoYanTmp_*
 rm -rf ./LuoYanTmp_*
 mkdir -p "${WORKDIR}"
 
-log_info "Downloading function file from GitHub..."
+msg_info "Downloading function file from GitHub..."
 curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/new/AAPFunction" -o ${WORKDIR}/AAPFunction
 EXITSTATUS=$?
 if [[ $EXITSTATUS != 0 ]]; then
-	log_err "SOMETHING WENT WRONG! CHECK YOUR INTERNET CONNECTION!"
+	msg_err "SOMETHING WENT WRONG! CHECK YOUR INTERNET CONNECTION!"
 	exit 1
 fi
 
 # 备份boot
 if [[ "${OS}" == "android" ]]; then
-	log_info "Backing up boot image..."
+	msg_info "Backing up boot image..."
 	dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
 	EXITSTATUS=$?
 	if [[ "${EXITSTATUS}" != "0" ]]; then
-		log_err "BOOT IMAGE BACKUP FAILED!"
-		log_warn "Now skiping backingup boot image..."
+		msg_err "BOOT IMAGE BACKUP FAILED!"
+		msg_warn "Now skiping backingup boot image..."
 	else
-		log_info "Done. Boot image path: /storage/emulated/0/stock_boot${BOOTSUFFIX}.img"
+		msg_info "Done. Boot image path: /storage/emulated/0/stock_boot${BOOTSUFFIX}.img"
 	fi
 else
-	log_info "Current OS: ${OS}. Skiping backup..."
+	msg_info "Current OS: ${OS}. Skiping backup..."
 fi
 
 # 加载操作文件
@@ -187,18 +187,18 @@ get_device_boot
 get_tools
 patch_boot
 if [[ -n ${INSTALL} ]]; then
-	log_warn "The -I parameter was received. Will install patched image."
+	msg_warn "The -I parameter was received. Will install patched image."
 	flash_boot
 else
 	if [[ "${OS}" == "android" ]]; then
-		log_info "Now copying patched image to /storage/emulated/0/patched_boot.img..."
+		msg_info "Now copying patched image to /storage/emulated/0/patched_boot.img..."
 		mv ${WORKDIR}/new-boot.img /storage/emulated/0/patched_boot.img
 	else
-		log_info "Now copying patched image to ${HOME}/patched_boot.img..."
+		msg_info "Now copying patched image to ${HOME}/patched_boot.img..."
 		mv ${WORKDIR}/new-boot.img ${HOME}/patched_boot.img
 	fi
-	log_info "Done. Now deleting tmp files..."
+	msg_info "Done. Now deleting tmp files..."
 	rm -rf ${WORKDIR}
-	log_info "Done."
+	msg_info "Done."
 fi
 print_superkey
