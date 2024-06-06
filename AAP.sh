@@ -2,20 +2,22 @@
 #by Akina | LuoYan
 #2024-06-03 Rewrite
 
-RED="\E[1;31m"
-YELLOW="\E[1;33m"
-BLUE="\E[1;34m"
-GREEN="\E[1;32m"
-RESET="\E[0m"
-LUOYANRANDOM="$(date "+%N")"
-msg_info() {
-	echo -e "${BLUE}[INFO] $(date "+%H:%M:%S"): $1${RESET}"
+# 特殊变量
+RED="\033[1;31m"          # RED
+YELLOW="\033[1;33m"       # YELLOW
+BLUE="\033[40;34m"        # BLUE
+RESET="\033[0m"           # RESET
+RANDOMNUM="$(date "+%N")" # RANDOM NUMBER
+
+# 格式化打印消息
+msg_info() { # 打印消息 格式: "[INFO] TIME: MSG"(BLUE)
+	printf "${BLUE}%s${RESET}" "[INFO]$(date "+%H:%M:%S"): $1"
 }
-msg_err() {
-	echo -e "${RED}[ERROR] $(date "+%H:%M:%S"): $1${RESET}"
+msg_warn() { # 打印消息 格式: "[WARN] TIME: MSG"(YELLOW)
+	printf "${YELLOW}%s${RESET}" "[WARN]$(date "+%H:%M:%S"): $1"
 }
-msg_warn() {
-	echo -e "${YELLOW}[WARN] $(date "+%H:%M:%S"): $1${RESET}"
+msg_err() { # 打印消息 格式: "[ERROR] TIME: MSG"(RED)
+	printf "${RED}%s${RESET}" "[ERROR]$(date "+%H:%M:%S"): $1"
 }
 if (command -v getprop >/dev/null 2>&1); then
 	OS="android"
@@ -113,9 +115,9 @@ if [[ $"${OS}" == "linux" && -z "${BOOTPATH}" ]]; then
 fi
 # 设置工作文件夹
 if [[ "${OS}" == "android" ]]; then
-	WORKDIR="/data/local/tmp/LuoYanTmp_${LUOYANRANDOM}"
+	WORKDIR="/data/local/tmp/LuoYanTmp_${RANDOMNUM}"
 else
-	WORKDIR="/tmp/LuoYanTmp_${LUOYANRANDOM}"
+	WORKDIR="/tmp/LuoYanTmp_${RANDOMNUM}"
 fi
 # 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
 BYNAMEPATH="$(getprop ro.frp.pst | sed 's/\/frp//g')"
