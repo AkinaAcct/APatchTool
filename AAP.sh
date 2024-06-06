@@ -11,13 +11,13 @@ RANDOMNUM="$(date "+%N")" # RANDOM NUMBER
 
 # 格式化打印消息
 msg_info() { # 打印消息 格式: "[INFO] TIME: MSG"(BLUE)
-	printf "${BLUE}%s${RESET}" "[INFO]$(date "+%H:%M:%S"): $1"
+	printf "${BLUE} %s\n ${RESET}" "[INFO]$(date "+%H:%M:%S"): $1"
 }
 msg_warn() { # 打印消息 格式: "[WARN] TIME: MSG"(YELLOW)
-	printf "${YELLOW}%s${RESET}" "[WARN]$(date "+%H:%M:%S"): $1"
+	printf "${YELLOW} %s\n ${RESET}" "[WARN]$(date "+%H:%M:%S"): $1"
 }
 msg_err() { # 打印消息 格式: "[ERROR] TIME: MSG"(RED)
-	printf "${RED}%s${RESET}" "[ERROR]$(date "+%H:%M:%S"): $1"
+	printf "${RED} %s\n ${RESET}" "[ERROR]$(date "+%H:%M:%S"): $1"
 }
 if (command -v getprop >/dev/null 2>&1); then
 	OS="android"
