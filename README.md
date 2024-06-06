@@ -13,11 +13,14 @@ This script has the following functions:
 - User-specified SuperKey.[What is SuperKey?](https://apatch.top/faq.html#what-is-superkey) 
 - Only patch but not install support.
 
+> [!NOTE]
+> Because of some problems that may occur, support for all terminal software other than Termux has been dropped.
+
 ---
 
 ## Usage
 
-- Open Termux(or MT terminal,etc.)
+- Open Termux(**Other terminal app in Android is not support!**)
 
 - Prepare
 
@@ -36,16 +39,6 @@ Usage:
 ```shell
 ./AAP.sh -h
 ```
-
----
-
-## TODO
-
-- [x] User-specified boot image path.  
-- [x] User-specified Superkey.  
-- [x] User-specified KernelPatch version.  
-- [x] Other terminal software support(e.g. MT).  
-- [x] Linux Support.  
 
 ---
 
