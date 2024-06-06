@@ -156,11 +156,11 @@ fi
 
 # 清理可能存在的上次运行文件
 rm -rf /tmp/LuoYanTmp_*
-rm -rf ./LuoYanTmp_*
+rm -rf /data/local/tmp/LuoYanTmp_*
 mkdir -p "${WORKDIR}"
 
 msg_info "Downloading function file from GitHub..."
-curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/new/AAPFunction" -o ${WORKDIR}/AAPFunction
+curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
 EXITSTATUS=$?
 if [[ $EXITSTATUS != 0 ]]; then
 	msg_err "SOMETHING WENT WRONG! CHECK YOUR INTERNET CONNECTION!"
