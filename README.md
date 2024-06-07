@@ -30,7 +30,7 @@ curl -LO https://raw.githubusercontent.com/AkinaAcct/APatchAutoPatchTool/main/AA
 chmod +x AAP-New.sh
 ```
 
-*After this, You can directly run AAP.sh after command tsu is executed.*
+*After this, You can directly run AAP.sh after command `tsu` is executed.*
 
 - Run
 
