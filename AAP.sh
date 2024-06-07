@@ -1,6 +1,7 @@
 #!/bin/sh
 #by Akina | LuoYan
 #2024-06-03 Rewrite
+#shellcheck disable=SC2059,SC2086,SC2166
 
 # 特殊变量
 RED="\033[1;31m"          # RED
@@ -103,7 +104,7 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
 done
 
 # ROOT 检测
-if [ $(id -u) -ne 0 ]; then
+if [ "$(id -u)" -ne 0 ]; then
     msg_err "Run this script with root!"
     exit 127
 fi
@@ -168,7 +169,7 @@ else
 fi
 
 # 加载操作文件
-. ./AAPFunction
+source ./AAPFunction
 
 get_device_boot
 get_tools
