@@ -27,7 +27,7 @@ This script has the following functions:
 ```bash
 cd ${HOME}
 curl -LO https://raw.githubusercontent.com/AkinaAcct/APatchAutoPatchTool/main/AAP.sh
-chmod +x AAP-New.sh
+chmod +x AAP.sh
 ```
 
 *After this, You can directly run AAP.sh after command `tsu` is executed.*
