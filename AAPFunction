@@ -10,7 +10,7 @@ get_device_boot() {
 			msg_fatal "Get boot image from device failed!"
 		fi
 	else
-		cp ${BOOTPATH} ${WORKDIR}/boot${BOOTSUFFIX}.img
+		cp ${BOOTPATH} "${WORKDIR}/boot${BOOTSUFFIX}.img"
 	fi
 	msg_info "Done."
 }
