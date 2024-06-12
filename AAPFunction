@@ -3,19 +3,17 @@
 get_device_boot() {
 	msg_info "Getting boot image..."
 	if [ -z "${BOOTPATH}" ]; then
-		msg_info "Current boot: ${BOOTSUFFIX}(If empty: A-Only devices)"
+		msg_info "Current boot: ${BOOTSUFFIX}(If empty: A-Only device)"
 		dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=${WORKDIR}/boot${BOOTSUFFIX}.img
 		EXITSTATUS=$?
 		if [ $EXITSTATUS != 0 ]; then
-			msg_err "GET BOOT IMAGE FAILED!"
-			exit 1
+			msg_fatal "Get boot image from device failed!"
 		fi
 	else
 		cp ${BOOTPATH} ${WORKDIR}/boot${BOOTSUFFIX}.img
 	fi
 	msg_info "Done."
 }
-
 get_tools() {
 	cd "${WORKDIR}" || exit 1
 	msg_info "Downloading kptools-${OS}..."
@@ -32,8 +30,8 @@ get_tools() {
 		EXITSTATUS=$?
 	fi
 	if [ $EXITSTATUS != 0 ]; then
-		msg_err "DOWNLOAD FAILED!"
-		msg_err "Please check your internet connection."
+		msg_fatal "DOWNLOAD FAILED!"
+		msg_fatal "Please check your internet connection."
 		exit 1
 	fi
 	chmod +x kptools-${OS}
@@ -47,8 +45,8 @@ get_tools() {
 		EXITSTATUS=$?
 	fi
 	if [ $EXITSTATUS != 0 ]; then
-		msg_err "DOWNLOAD FAILED!"
-		msg_err "Please check your internet connection."
+		msg_fatal "DOWNLOAD FAILED!"
+		msg_fatal "Please check your internet connection."
 		exit 1
 	fi
 	msg_info "Done."
@@ -56,8 +54,8 @@ get_tools() {
 	curl -LO --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/bin/magiskboot"
 	EXITSTATUS=$?
 	if [ $EXITSTATUS != 0 ]; then
-		msg_err "DOWNLOAD FAILED!"
-		msg_err "Please check your internet connection."
+		msg_fatal "DOWNLOAD FAILED!"
+		msg_fatal "Please check your internet connection."
 		exit 1
 	fi
 	chmod +x magiskboot
@@ -69,7 +67,7 @@ patch_boot() {
 	./magiskboot unpack boot${BOOTSUFFIX}.img
 	EXITSTATUS=$?
 	if [ $EXITSTATUS != 0 ]; then
-		msg_err "UNPACK BOOT IMAGE FAILED!"
+		msg_fatal "UNPACK BOOT IMAGE FAILED!"
 		exit 1
 	fi
 	msg_info "Done."
@@ -85,7 +83,7 @@ patch_boot() {
 	./kptools-${OS} --patch --kpimg kpimg-android --skey "${SUPERKEY}" --image kernel --out kernel ${EXTRAARGS}
 	EXITSTATUS=$?
 	if [ ${EXITSTATUS} != 0 ]; then
-		msg_err "PATCH FAILED!"
+		msg_fatal "PATCH FAILED!"
 		exit 1
 	fi
 	msg_info "Done."
@@ -93,7 +91,7 @@ patch_boot() {
 	./magiskboot repack boot${BOOTSUFFIX}.img
 	EXITSTATUS=$?
 	if [ $EXITSTATUS != 0 ]; then
-		msg_err "REPACK FAILED!"
+		msg_fatal "REPACK FAILED!"
 		exit 1
 	fi
 	msg_info "Done. Finished paching."
@@ -101,31 +99,36 @@ patch_boot() {
 
 flash_boot() {
 	if [ "${OS}" = "android" ]; then
-		msg_info "Flashing boot image..."
-		if [ -n "${TBOOTSUFFIX}" ]; then
-			msg_warn "You previously specified that you want to install to another slot. Target slot:${TBOOTSUFFIX}."
-			BOOTSUFFIX=${TBOOTSUFFIX}
-		fi
-		dd if=${WORKDIR}/new-boot.img of=${BYNAMEPATH}/boot${BOOTSUFFIX}
-		EXITSTATUS=$?
-		if [ ${EXITSTATUS} != 0 ]; then
-			msg_err "WARNING! IMAGE FLASH FAILED!"
-			msg_err "Now trying to restore..."
-			dd if=${WORKDIR}/boot${BOOTSUFFIX}.img of=${BYNAMEPATH}/boot${BOOTSUFFIX}
+		if ${ROOT}; then
+			msg_info "Flashing boot image..."
+			if [ -n "${TBOOTSUFFIX}" ]; then
+				msg_warn "You previously specified that you want to install to another slot. Target slot:${TBOOTSUFFIX}."
+				BOOTSUFFIX=${TBOOTSUFFIX}
+			fi
+			dd if=${WORKDIR}/new-boot.img of=${BYNAMEPATH}/boot${BOOTSUFFIX}
 			EXITSTATUS=$?
 			if [ ${EXITSTATUS} != 0 ]; then
-				msg_err "WARNING!!! RESTORE FAILED!!!"
-				msg_err "Even I can't help you now. You can try to restore boot manually."
-				exit 1
+				msg_fatal "WARNING! IMAGE FLASH FAILED!"
+				msg_fatal "Now trying to restore..."
+				dd if=${WORKDIR}/boot${BOOTSUFFIX}.img of=${BYNAMEPATH}/boot${BOOTSUFFIX}
+				EXITSTATUS=$?
+				if [ ${EXITSTATUS} != 0 ]; then
+					msg_fatal "WARNING!!! RESTORE FAILED!!!"
+					msg_fatal "Even I can't help you now. You can try to restore boot manually."
+					exit 1
+				fi
+				msg_info "Restore Sucessfully."
 			fi
-			msg_info "Restore Sucessfully."
+			msg_info "Flash done."
+			msg_info "Cleaning temporary files..."
+			rm -rf ${WORKDIR}
+			msg_info "Done."
+		else
+			msg_fatal "No root. Unable to continue. Exited."
+			exit 1
 		fi
-		msg_info "Flash done."
-		msg_info "Cleaning temporary files..."
-		rm -rf ${WORKDIR}
-		msg_info "Done."
 	else
-		msg_err "You are trying to change this script. Linux does not require a flashing step. This is the second level of warning."
+		msg_fatal "You are trying to change this script. Linux does not require a flashing step. This is the second level of warning."
 		exit 1
 	fi
 }

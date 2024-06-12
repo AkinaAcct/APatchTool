@@ -12,14 +12,24 @@ RANDOMNUM=$(date "+%N") # RANDOM NUMBER
 
 # 格式化打印消息
 msg_info() { # 打印消息 格式: "[INFO] TIME: MSG"(BLUE)
-	printf "${BLUE}[INFO]$(date "+%H:%M:%S"): $1${RESET}\n"
+	printf "${BLUE}[INFO] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
 msg_warn() { # 打印消息 格式: "[WARN] TIME: MSG"(YELLOW)
-	printf "${YELLOW}[WARN]$(date "+%H:%M:%S"): $1${RESET}\n"
+	printf "${YELLOW}[WARN] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
 msg_err() { # 打印消息 格式: "[ERROR] TIME: MSG"(RED)
-	printf "${RED}[ERROR]$(date "+%H:%M:%S"): $1${RESET}\n"
+	printf "${RED}[ERROR] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
+msg_fatal() { # 打印消息并停止运行 格式: "[FATAL] TIME: MSG"(RED)
+	printf "${RED}[FATAL] $(date "+%H:%M:%S"): ${1}${RESET}\n"
+}
+# ROOT 检测
+if [ "$(id -u)" -ne 0 ]; then
+	ROOT=true
+else
+	ROOT=false
+fi
+# OS 检测
 if command -v getprop >/dev/null 2>&1; then
 	OS="android"
 	msg_info "OS: ${OS}"
@@ -28,7 +38,7 @@ else
 	msg_warn "You are using ${OS}. Using this script on ${OS} is still under testing."
 fi
 if [ -z "$(echo ${PREFIX} | grep -i termux)" -a "${OS}" = "android" ]; then
-	msg_err "Unsupport terminal app(not in Termux)."
+	msg_warn "Unsupported terminal app(not in Termux)."
 fi
 print_help() {
 	printf "${BLUE}%s${RESET}" "
@@ -57,7 +67,7 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
 		if [ -e "${BOOTPATH}" ]; then
 			msg_info "Boot image path specified. Current image path: ${BOOTPATH}"
 		else
-			msg_err "SPECIFIED BOOT IMAGE PATH IS WRONG! NO SUCH FILE!"
+			msg_fatal "SPECIFIED BOOT IMAGE PATH IS WRONG! NO SUCH FILE!"
 			exit 1
 		fi
 		;;
@@ -77,7 +87,7 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
 			INSTALL="true"
 			msg_info "The -I parameter was received. Will install after patching."
 		else
-			msg_err "Do not use this arg without Android!"
+			msg_fatal "Do not use this arg without Android!"
 			exit 1
 		fi
 		;;
@@ -94,39 +104,40 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
 		msg_info "The -E parameter was received. Current extra args: ${EXTRAARGS}"
 		;;
 	:)
-		msg_err "Option -${OPTARG} requires an argument.." >&2 && exit 1
+		msg_fatal "Option -${OPTARG} requires an argument.." >&2
+		exit 1
 		;;
 
 	?)
-		msg_err "Invalid option: -${OPTARG}" >&2 && exit 1
+		msg_fatal "Invalid option: -${OPTARG}" >&2
+		exit 1
 		;;
 	esac
 done
-
-# ROOT 检测
-if [ "$(id -u)" -ne 0 ]; then
-	msg_err "Run this script with root!"
-	exit 127
-fi
 # 镜像路径检测(For Linux)
 if [ "${OS}" = "linux" -a -z "${BOOTPATH}" ]; then
-	msg_err "You are using ${OS}, but there is no image specified by you. Exited."
+	msg_fatal "You are using ${OS}, but there is no image specified by you. Exited."
+	exit 1
+fi
+# 无 ROOT 并且未指定 BOOT 镜像路径则退出
+if [ -z "${BOOTPATH}" -a ${ROOT} ]; then
+	msg_fatal "No root and no boot image is specified. Exited."
 	exit 1
 fi
 # 设置工作文件夹
 if [ "${OS}" = "android" ]; then
-	WORKDIR="/data/local/tmp/LuoYanTmp_${RANDOMNUM}"
+	WORKDIR="./LuoYanTmp_${RANDOMNUM}"
 else
 	WORKDIR="/tmp/LuoYanTmp_${RANDOMNUM}"
 fi
 # 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
 BYNAMEPATH=$(getprop ro.frp.pst | sed 's/\/frp//g')
 if [ "${OS}" = "android" ]; then
-	if [ ! -e ${BYNAMEPATH}/boot ]; then
+	if [ ! -e "${BYNAMEPATH}/boot" ]; then
 		BOOTSUFFIX=$(getprop ro.boot.slot_suffix)
 	fi
 else
-	msg_warn "Current OS is: ${OS}. Skip boot slot check."
+	msg_warn "Current OS is not Android. Skip boot slot check."
 fi
 if [ -n "${SAVEROOT}" -a -n "${BOOTSUFFIX}" -a "${OS}" = "android" ]; then
 	if [ "${BOOTSUFFIX}" = "_a" ]; then
@@ -139,37 +150,40 @@ fi
 if [ -z "${SUPERKEY}" ]; then
 	SUPERKEY=${RANDOMNUM}
 fi
-
 # 清理可能存在的上次运行文件
 rm -rf /tmp/LuoYanTmp_*
-rm -rf /data/local/tmp/LuoYanTmp_*
+rm -rf ./LuoYanTmp_*
 mkdir -p "${WORKDIR}"
 
 msg_info "Downloading function file from GitHub..."
 curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
 EXITSTATUS=$?
 if [ $EXITSTATUS != 0 ]; then
-	msg_err "SOMETHING WENT WRONG! CHECK YOUR INTERNET CONNECTION!"
+	msg_fatal "Download failed. Check your Internet connection and try again."
 	exit 1
 fi
 
 # 备份boot
-if [ "${OS}" = "android" ]; then
-	msg_info "Backing up boot image..."
-	dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
-	EXITSTATUS=$?
-	if [ "${EXITSTATUS}" != "0" ]; then
-		msg_err "BOOT IMAGE BACKUP FAILED!"
-		msg_warn "Now skiping backingup boot image..."
+if ${ROOT}; then
+	if [ "${OS}" = "android" ]; then
+		msg_info "Backing up boot image..."
+		dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
+		EXITSTATUS=$?
+		if [ "${EXITSTATUS}" != "0" ]; then
+			msg_err "BOOT IMAGE BACKUP FAILED!"
+			msg_warn "Now skiping backingup boot image..."
+		else
+			msg_info "Done. Boot image path: /storage/emulated/0/stock_boot${BOOTSUFFIX}.img"
+		fi
 	else
-		msg_info "Done. Boot image path: /storage/emulated/0/stock_boot${BOOTSUFFIX}.img"
+		msg_info "Current OS: ${OS}. Skiping backup..."
 	fi
 else
-	msg_info "Current OS: ${OS}. Skiping backup..."
+	msg_warn "No root. Skiping backup..."
 fi
 
 # 加载操作文件
-source ./AAPFunction
+. ${WORKDIR}/AAPFunction
 
 get_device_boot
 get_tools
