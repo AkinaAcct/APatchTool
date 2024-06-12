@@ -44,7 +44,7 @@ print_help() {
 	printf "${BLUE}%s${RESET}" "
 APatch Auto Patch Tool
 Written by Akina
-Version: 3.0.0
+Version: 3.1.0
 Current DIR: $(pwd)
 
 -h, -v,                 print the usage and version.
