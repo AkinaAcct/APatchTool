@@ -1,5 +1,6 @@
 #!/bin/sh
 #rewrited
+#shellcheck disable=SC2086
 get_device_boot() {
 	msg_info "Getting boot image..."
 	if [ -z "${BOOTPATH}" ]; then
@@ -124,7 +125,7 @@ flash_boot() {
 			rm -rf ${WORKDIR}
 			msg_info "Done."
 		else
-			msg_fatal "No root. Unable to continue. Exited."
+			msg_fatal "No root. Unable to continue. Aborted."
 			exit 1
 		fi
 	else
@@ -138,7 +139,7 @@ print_superkey() {
 ####################################
 
 
-    YOUR SUPERKEY IS "$(printf "${BLUE}${SUPERKEY}${RESET}")"
+    YOUR SUPERKEY IS "$(printf "${BLUE}%s${RESET}" "${SUPERKEY}")"
 
     DON'T FORGET IT!!
 

@@ -3,6 +3,11 @@
 #2024-06-03 Rewrite
 #shellcheck disable=SC2059,SC2086,SC2166
 
+if [ ${APTOOLDEBUG} -eq 1 ]; then
+	printf "[\033[1;33mWARN] $(date "+%H:%M:%S"): Debug mode is on.\033[0m\n"
+	set -x
+fi
+
 # 特殊变量
 RED="\033[1;31m"        # RED
 YELLOW="\033[1;33m"     # YELLOW
@@ -54,7 +59,6 @@ Current DIR: $(pwd)
 -s \"STRING\",            specify a superkey. Use STRING as superkey.
 -S,                     Install to another slot (for OTA).
 -E [ARGS],              Add args [ARGS] to kptools when patching.
--V,                     verbose mode.
 "
 	exit 0
 }
@@ -77,10 +81,6 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
 	S)
 		SAVEROOT="true"
 		msg_info "The -S parameter was received. The patched image will be flashed into another slot if this is a ab partition device."
-		;;
-	V)
-		set -x
-		msg_warn "DEBUG MODE IS ON."
 		;;
 	I)
 		if [ "${OS}" = "android" ]; then
@@ -116,12 +116,12 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
 done
 # 镜像路径检测(For Linux)
 if [ "${OS}" = "linux" -a -z "${BOOTPATH}" ]; then
-	msg_fatal "You are using ${OS}, but there is no image specified by you. Exited."
+	msg_fatal "You are using ${OS}, but there is no image specified by you. Aborted."
 	exit 1
 fi
 # 无 ROOT 并且未指定 BOOT 镜像路径则退出
 if [ -z "${BOOTPATH}" -a ${ROOT} ]; then
-	msg_fatal "No root and no boot image is specified. Exited."
+	msg_fatal "No root and no boot image is specified. Aborted."
 	exit 1
 fi
 # 设置工作文件夹
