@@ -103,7 +103,7 @@ def patch_boot(bootpath):
     logger.info("Unpack fininshed")
     logger.info("Start patch...")
     os.system(
-        f"./kptool --patch --kpimg kpimg --skey {skey} --image kernel --out kernel"
+        f"./kptool --patch --kpimg kpimg --skey {skey} --image kernel {eargs} --out kernel"
     )
     logger.info("Patch fininshed.")
     logger.info("Start repack...")
@@ -126,11 +126,18 @@ def main():
         type=str,
         help="Specify superkey. The default is a seven-digit number.",
     )
+    parser.add_argument(
+        "-E",
+        "--extra",
+        type=str,
+        help="Extra args to kptool."
+    )
 
     # 解析参数
     args = parser.parse_args()
     imagepath = args.imagepath
     skey = args.skey
+    eargs = args.extra
 
     # 使用参数
     if args.verbose:
