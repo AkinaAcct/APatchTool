@@ -6,7 +6,6 @@ import argparse
 import random
 import logging
 import colorlog
-from colorama import Fore, Back, Style
 from tqdm import tqdm
 
 rnum = str(random.randint(1000000, 9999999))
