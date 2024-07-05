@@ -109,6 +109,7 @@ def patch_boot(bootpath):
     logger.info("Start repack...")
     os.system(f"./magiskboot repack boot.img patched_boot.img")
     logger.info("Repack fininshed.")
+    logger.info(f"Success. The patched boot is {wdir}/patched_boot.img")
 
 
 def main():
