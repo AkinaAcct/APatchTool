@@ -18,4 +18,4 @@ jobs:
             ${{ github.event.commits[0].message }}
             ```By `${{ github.actor }}` in repo `${{ github.repository }}`
             
-            See changes: [${{ github.event.commits[0].message }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            See changes: [here](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
