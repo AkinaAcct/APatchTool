@@ -1,11 +1,4 @@
-import os
-import stat
-import requests
-import shutil
-import argparse
-import random
-import logging
-import colorlog
+import os, stat, requests, shutil, argparse, random, logging, colorlog
 from tqdm import tqdm
 
 rnum = str(random.randint(1000000, 9999999))
@@ -126,12 +119,7 @@ def main():
         type=str,
         help="Specify superkey. The default is a seven-digit number.",
     )
-    parser.add_argument(
-        "-E",
-        "--extra",
-        type=str,
-        help="Extra args to kptool."
-    )
+    parser.add_argument("-E", "--extra", type=str, help="Extra args to kptool.")
 
     # 解析参数
     args = parser.parse_args()
