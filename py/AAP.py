@@ -3,8 +3,8 @@ from tqdm import tqdm
 
 rnum = str(random.randint(1000000, 9999999))
 skey = str(rnum)
+eargs = ""
 wdir = "./TMP_" + rnum
-os.mkdir(wdir)
 
 
 def setup_logger():
@@ -36,9 +36,6 @@ def setup_logger():
     logger.addHandler(ch)
 
     return logger
-
-
-logger = setup_logger()
 
 
 def download_file(url, local_filename):
@@ -102,17 +99,16 @@ def patch_boot(bootpath):
     logger.info("Start repack...")
     os.system(f"./magiskboot repack boot.img patched_boot.img")
     logger.info("Repack fininshed.")
-    logger.info(f"Success. The patched boot is {wdir}/patched_boot.img")
+    logger.info(
+        f"Success. The patched boot is {wdir}/patched_boot.img, superkey is {skey}"
+    )
 
 
 def main():
     parser = argparse.ArgumentParser(description="APatch Tool.")
 
     # 添加参数
-    parser.add_argument("imagepath", type=str, help="Boot image path")
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose mode."
-    )
+    parser.add_argument("IMAGEPATH", type=str, help="Boot image path")
     parser.add_argument(
         "-s",
         "--skey",
@@ -120,23 +116,31 @@ def main():
         help="Specify superkey. The default is a seven-digit number.",
     )
     parser.add_argument("-E", "--extra", type=str, help="Extra args to kptool.")
-
     # 解析参数
+    os.mkdir(wdir)
+    global args, IMAGEPATH, skey, eargs, logger
     args = parser.parse_args()
-    imagepath = args.imagepath
+    IMAGEPATH = args.IMAGEPATH
     skey = args.skey
     eargs = args.extra
+    logger = setup_logger()
 
     # 使用参数
-    if args.verbose:
-        print("Verbose mode is on.")
-    if os.path.isfile(imagepath):
-        print(f"Boot image path: {imagepath}")
+    if os.path.isfile(IMAGEPATH):
+        logger.info(f"Boot image path: {IMAGEPATH}")
     else:
-        print(f"{imagepath}: No such file.")
+        logger.fatal(f"{IMAGEPATH}: No such file.")
         quit()
+    if eargs is None:
+        logger.info("No extra args.")
+    else:
+        logger.warning(f"Received extra args: {eargs}")
+    if skey is None:
+        logger.info(f"No skey provided. Use {skey}")
+    else:
+        logger.info(f"Received skey: {skey}")
     get_tool()
-    patch_boot(imagepath)
+    patch_boot(IMAGEPATH)
 
 
 if __name__ == "__main__":
