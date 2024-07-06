@@ -1,10 +1,5 @@
-import os, stat, requests, shutil, argparse, random, logging, colorlog
+import os, stat, requests, shutil, argparse, random, logging, colorlog, platform
 from tqdm import tqdm
-
-rnum = str(random.randint(1000000, 9999999))
-skey = str(rnum)
-eargs = ""
-wdir = "./TMP_" + rnum
 
 
 def setup_logger():
@@ -61,17 +56,37 @@ def copy_file(src, dst):
         print(f"Failed: from {src} to {dst}: {e}")
 
 
+def detect_os():
+    system = platform.system()
+    if system == "Linux":
+        # 进一步检查是否为Android
+        if "ANDROID_ROOT" in os.environ:
+            return "android"
+        else:
+            return "linux"
+    elif system == "Windows":
+        return "windows"
+    elif system == "Darwin":
+        return "macos"
+    else:
+        return "unknown"
+
+
 def get_tool():
-    kptool = "https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-android"
-    kpimg = (
-        "https://github.com/bmax121/KernelPatch/releases/latest/download/kpimg-android"
-    )
+    # https://github.com/bmax121/KernelPatch/releases/download/0.11.0-dev/kptools-android
+    # https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-android
+    if kpver is None:
+        kptool = f"https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-{operasys}"
+        kpimg = "https://github.com/bmax121/KernelPatch/releases/latest/download/kpimg-android"
+    else:
+        kptool = f"https://github.com/bmax121/KernelPatch/releases/download/{kpver}/kptools-android"
+        kpimg = f"https://github.com/bmax121/KernelPatch/releases/download/{kpver}/kpimg-android"
     mboot = "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/bin/magiskboot"
-    logger.info("Downloading kptool...")
-    download_file(kptool, wdir + "/kptool")
+    logger.info(f"Downloading kptool-{operasys}...")
+    download_file(kptool, wdir + f"/kptool-{operasys}")
     logger.info("Fininshed")
-    logger.info("Downloading kpimg...")
-    download_file(kpimg, wdir + "/kpimg")
+    logger.info("Downloading kpimg-android...")
+    download_file(kpimg, wdir + "/kpimg-android")
     logger.info("Fininshed.")
     logger.info("Downloading magiskboot...")
     download_file(mboot, wdir + "/magiskboot")
@@ -93,7 +108,7 @@ def patch_boot(bootpath):
     logger.info("Unpack fininshed")
     logger.info("Start patch...")
     os.system(
-        f"./kptool --patch --kpimg kpimg --skey {skey} --image kernel {eargs} --out kernel"
+        f"./kptool-{operasys} --patch --kpimg kpimg --skey {skey} --image kernel {eargs} --out kernel"
     )
     logger.info("Patch fininshed.")
     logger.info("Start repack...")
@@ -110,6 +125,12 @@ def main():
     # 添加参数
     parser.add_argument("IMAGEPATH", type=str, help="Boot image path")
     parser.add_argument(
+        "-k",
+        "--kpver",
+        type=str,
+        help="Specify a KernelPatch version. Default is latest release. For example, `--kpver 0.11.0-dev`",
+    )
+    parser.add_argument(
         "-s",
         "--skey",
         type=str,
@@ -117,25 +138,35 @@ def main():
     )
     parser.add_argument("-E", "--extra", type=str, help="Extra args to kptool.")
     # 解析参数
-    os.mkdir(wdir)
-    global args, IMAGEPATH, skey, eargs, logger
+    global rnum, wdir, args, IMAGEPATH, skey, eargs, logger, operasys, kpver
     args = parser.parse_args()
     IMAGEPATH = args.IMAGEPATH
-    skey = args.skey
+    rnum = str(random.randint(1000000, 9999999))
+    wdir = "./TMP_" + rnum
+    os.mkdir(wdir)
+    skey = rnum
+    if args.skey != None:
+        skey = args.skey
     eargs = args.extra
+    kpver = args.kpver
     logger = setup_logger()
+    operasys = detect_os()
 
-    # 使用参数
+    # 判断参数内容
     if os.path.isfile(IMAGEPATH):
         logger.info(f"Boot image path: {IMAGEPATH}")
     else:
         logger.fatal(f"{IMAGEPATH}: No such file.")
         quit()
+    if kpver is None:
+        logger.info("No KP version is specified. Use latest release.")
+    else:
+        logger.info(f"Received KP version. Use version: {kpver}")
     if eargs is None:
         logger.info("No extra args.")
     else:
         logger.warning(f"Received extra args: {eargs}")
-    if skey is None:
+    if skey is rnum:
         logger.info(f"No skey provided. Use {skey}")
     else:
         logger.info(f"Received skey: {skey}")
