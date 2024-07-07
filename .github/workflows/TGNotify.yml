@@ -1,7 +1,7 @@
 name: telegram message
 on: [push]
 jobs:
-  send msg:
+  send_msg:
     name: send
     runs-on: ubuntu-latest
     steps:
