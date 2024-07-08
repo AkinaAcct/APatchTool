@@ -64,12 +64,11 @@ def detect_os():
             return "android"
         else:
             return "linux"
-    elif system == "Windows":
-        return "windows"
     elif system == "Darwin":
-        return "macos"
+        return "mac"
     else:
-        return "unknown"
+        logger.fatal(f"Unable to confirm the current operating system or unsupported OS! Detected OS:{system}. Aborted.")
+        quit()
 
 
 def get_tool():
@@ -79,7 +78,7 @@ def get_tool():
         kptool = f"https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-{operasys}"
         kpimg = "https://github.com/bmax121/KernelPatch/releases/latest/download/kpimg-android"
     else:
-        kptool = f"https://github.com/bmax121/KernelPatch/releases/download/{kpver}/kptools-android"
+        kptool = f"https://github.com/bmax121/KernelPatch/releases/download/{kpver}/kptools-{operasys}"
         kpimg = f"https://github.com/bmax121/KernelPatch/releases/download/{kpver}/kpimg-android"
     mboot = "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/bin/magiskboot"
     logger.info(f"Downloading kptool-{operasys}...")
@@ -174,5 +173,6 @@ def main():
     patch_boot(IMAGEPATH)
 
 
+# 启动
 if __name__ == "__main__":
     main()
