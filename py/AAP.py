@@ -167,7 +167,7 @@ def main():
     else:
         logger.warning(f"Received extra args: {eargs}")
     if skey is rnum:
-        logger.info(f"No skey provided. Use {skey}")
+        logger.warning(f"No skey provided. Using the default random number as SuperKey is not a good idea. Current SuperKey:{skey}.")
     else:
         logger.info(f"Received skey: {skey}")
     get_tool()
