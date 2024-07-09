@@ -3,9 +3,11 @@
 #2024-06-03 Rewrite
 #shellcheck disable=SC2059,SC2086,SC2166
 
-if [ ${APTOOLDEBUG} -eq 1 ]; then
-    printf "[\033[1;33mWARN] $(date "+%H:%M:%S"): Debug mode is on.\033[0m\n"
-    set -x
+if [ -n "${APTOOLDEBUG}" ]; then
+    if [ ${APTOOLDEBUG} -eq 1 ]; then
+        printf "[\033[1;33mWARN] $(date "+%H:%M:%S"): Debug mode is on.\033[0m\n"
+        set -x
+    fi
 fi
 
 # 特殊变量
