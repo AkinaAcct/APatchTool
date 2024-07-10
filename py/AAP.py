@@ -109,14 +109,14 @@ def patch_boot(bootpath):
     logger.info("Unpack fininshed")
     logger.info("Start patch...")
     os.system(
-        f"./kptool-{operasys} --patch --kpimg kpimg --skey {skey} --image kernel {eargs} --out kernel"
+        f"./kptool-{operasys} --patch --kpimg kpimg --skey \"{skey}\" --image kernel \"{eargs}\" --out kernel"
     )
     logger.info("Patch fininshed.")
     logger.info("Start repack...")
     os.system(f"./magiskboot repack boot.img patched_boot.img")
     logger.info("Repack fininshed.")
     logger.info(
-        f"Success. The patched boot is {wdir}/patched_boot.img, superkey is {skey}"
+        f"Success. The patched boot is {wdir}/patched_boot.img, superkey is \"{skey}\""
     )
 
 
