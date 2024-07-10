@@ -70,7 +70,7 @@ NOTE: When arg -I not provided, the patched boot image will be stored in /storag
 # 参数解析
 while getopts ":hvi:k:IVs:SE:" OPT; do
     case $OPT in
-    i) # 处理选项i
+    i)
         BOOTPATH="${OPTARG}"
         if [ -e "${BOOTPATH}" ]; then
             msg_info "Boot image path specified. Current image path: ${BOOTPATH}"
