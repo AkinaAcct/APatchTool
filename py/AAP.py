@@ -67,7 +67,9 @@ def detect_os():
     elif system == "Darwin":
         return "mac"
     else:
-        logger.fatal(f"Unable to confirm the current operating system or unsupported OS! Detected OS:{system}. Aborted.")
+        logger.fatal(
+            f"Unable to confirm the current operating system or unsupported OS! Detected OS:{system}. Aborted."
+        )
         quit()
 
 
@@ -122,6 +124,11 @@ def main():
     parser = argparse.ArgumentParser(description="APatch Tool.")
 
     # 添加参数
+    parser.add_argument(
+        "--ota",
+        action="store_true",
+        help="Install patched image to another slot(for OTA). Require root.",
+    )
     parser.add_argument("IMAGEPATH", type=str, help="Boot image path")
     parser.add_argument(
         "-k",
@@ -166,9 +173,14 @@ def main():
     else:
         logger.warning(f"Received extra args: {eargs}")
     if skey is rnum:
-        logger.warning(f"No skey provided. Using the default random number as SuperKey is not a good idea. Current SuperKey:{skey}.")
+        logger.warning(
+            f"No skey provided. Using the default random number as SuperKey is not a good idea. Current SuperKey:{skey}."
+        )
     else:
         logger.info(f"Received skey: {skey}")
+    if args.ota:
+        logger.error(f"Received the arg --ota but this feature is not yet developed.")
+        quit()
     get_tool()
     patch_boot(IMAGEPATH)
 
