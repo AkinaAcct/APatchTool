@@ -109,7 +109,7 @@ def patch_boot(bootpath):
     logger.info("Unpack fininshed")
     logger.info("Start patch...")
     os.system(
-        f"./kptool-{operasys} --patch --kpimg kpimg --skey \"{skey}\" --image kernel \"{eargs}\" --out kernel"
+        f"./kptool-{operasys} --patch --kpimg kpimg-android --skey \"{skey}\" --image kernel \"{eargs}\" --out kernel"
     )
     logger.info("Patch fininshed.")
     logger.info("Start repack...")
