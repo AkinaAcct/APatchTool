@@ -1,4 +1,4 @@
-import os, stat, requests, shutil, argparse, random, logging, colorlog, platform
+import os, stat, requests, shutil, argparse, random, logging, colorlog, platform, subprocess
 from tqdm import tqdm
 
 
@@ -109,15 +109,21 @@ def patch_boot(bootpath):
     logger.info("Unpack fininshed")
     logger.info("Start patch...")
     os.system(
-        f"./kptool-{operasys} --patch --kpimg kpimg-android --skey \"{skey}\" --image kernel \"{eargs}\" --out kernel"
+        f'./kptool-{operasys} --patch --kpimg kpimg-android --skey "{skey}" --image kernel "{eargs}" --out kernel'
     )
     logger.info("Patch fininshed.")
     logger.info("Start repack...")
     os.system(f"./magiskboot repack boot.img patched_boot.img")
     logger.info("Repack fininshed.")
     logger.info(
-        f"Success. The patched boot is {wdir}/patched_boot.img, superkey is \"{skey}\""
+        f'Success. The patched boot is {wdir}/patched_boot.img, superkey is "{skey}"'
     )
+
+
+def flash_img(ImgPath, Target):
+    logger.info(f"Current slot: {Cslot}. Target slot: {Target}.")
+    subprocess.call(f"dd if={ImgPath} of={BootParentDir}/boot{Tslot}", shell=True)
+    logger.info(f'Done. Img installed. SuperKey is "{skey}".')
 
 
 def main():
@@ -127,24 +133,29 @@ def main():
     parser.add_argument(
         "--ota",
         action="store_true",
-        help="Install patched image to another slot(for OTA). Require root.",
+        help="install patched image to another slot(for OTA). Root is required.",
     )
-    parser.add_argument("IMAGEPATH", type=str, help="Boot image path")
+    parser.add_argument(
+        "--install",
+        action="store_true",
+        help="directly install patched_boot to current slot. Root is required.",
+    )
+    parser.add_argument("IMAGEPATH", type=str, help="boot image path")
     parser.add_argument(
         "-k",
         "--kpver",
         type=str,
-        help="Specify a KernelPatch version. Default is latest release. For example, `--kpver 0.11.0-dev`",
+        help="specify a KernelPatch version. Default is latest release. For example, `--kpver 0.11.0-dev`",
     )
     parser.add_argument(
         "-s",
         "--skey",
         type=str,
-        help="Specify superkey. The default is a seven-digit number.",
+        help="specify superkey. The default one is a random seven-digit number.",
     )
-    parser.add_argument("-E", "--extra", type=str, help="Extra args to kptool.")
+    parser.add_argument("-E", "--extra", type=str, help="extra args to kptool.")
     # 解析参数
-    global rnum, wdir, args, IMAGEPATH, skey, eargs, logger, operasys, kpver
+    global rnum, wdir, args, IMAGEPATH, skey, eargs, logger, operasys, kpver, Cslot, Tslot, BootParentDir
     args = parser.parse_args()
     IMAGEPATH = args.IMAGEPATH
     rnum = str(random.randint(1000000, 9999999))
@@ -178,11 +189,32 @@ def main():
         )
     else:
         logger.info(f"Received skey: {skey}")
-    if args.ota:
-        logger.error(f"Received the arg --ota but this feature is not yet developed.")
-        quit()
+    # check slot for --ota and --install
+    Cslot = subprocess.run("getprop ro.boot.slot_suffix", shell=True, capture_output=True, text=True)
+    if Cslot.returncode != 0:
+        logger.warning("Failed to get slot suffix")
+    Cslot = Cslot.stdout.strip()
+
+    BootParentDir = subprocess.run("getprop ro.frp.pst", shell=True, capture_output=True, text=True)
+    if BootParentDir.returncode != 0:
+        logger.warning("Failed to get FRP path")
+    BootParentDir = BootParentDir.stdout.strip().rsplit("/", 1)[0]
+
+    Tslot = ""
+    if Cslot == "_a":
+        Tslot = "_b"
+    elif Cslot == "_b":
+        Tslot = "_a"
+    else:
+        logger.warning(
+            "No slot detected. Are you using a non-ab device? Now skiping slot check..."
+        )
     get_tool()
     patch_boot(IMAGEPATH)
+    if args.install:
+        flash_img(f"{wdir}/patched_boot.img",f"{BootParentDir}/boot{Cslot}")
+    if args.ota:
+        flash_img(f"{wdir}/patched_boot.img", f"{BootParentDir}/boot{Tslot}")
 
 
 # 启动
