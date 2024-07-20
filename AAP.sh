@@ -9,7 +9,6 @@ if [ -n "${APTOOLDEBUG}" ]; then
         set -x
     fi
 fi
-
 # 特殊变量
 RED="\033[1;31m"        # RED
 YELLOW="\033[1;33m"     # YELLOW
@@ -31,8 +30,13 @@ msg_fatal() { # 打印消息并停止运行 格式: "[FATAL] TIME: MSG"(RED)
     printf "${RED}[FATAL] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
 # ROOT 检测
-if [ "$(id -u)" -ne 0 ]; then
+if [ "$(id -u)" -eq 0 ]; then
     ROOT=true
+        # 检测到 Magisk Delta/Kitsune 立即退出 越南猴子早该死了 XD
+        if [ "$(magisk -v | grep "delta")" -o "$(magisk -v | grep "kitsune")" ];then
+            msg_fatal "Detected Magisk Deleta/Kitsune: Unsupported environment. Aborted."
+            exit 114
+        fi
 else
     ROOT=false
 fi
