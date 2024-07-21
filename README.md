@@ -48,7 +48,7 @@ APTOOLDEBUG=1 ./AAP.sh [ARGS]
 
 ---
 
-If you encounter any issues, please submit a issue on github.
+If you encounter any issues, please submit an issue on github.
 
 ---
 
