@@ -213,7 +213,7 @@ def main():
         logger.warning(
             "No slot detected. Are you using a non-ab device? Now skiping slot check..."
         )
-    if os.geteuid() and (args.install or args.ota) == 0:
+    if os.geteuid() == 0 and (args.install or args.ota):
         if args.install:
             logger.info(f"Will install patched boot image to current slot: {Cslot}")
             flash_img(f"{wdir}/patched_boot.img", f"{BootParentDir}/boot{Cslot}")
