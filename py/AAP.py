@@ -190,12 +190,16 @@ def main():
     else:
         logger.info(f"Received skey: {skey}")
     # check slot for --ota and --install
-    Cslot = subprocess.run("getprop ro.boot.slot_suffix", shell=True, capture_output=True, text=True)
+    Cslot = subprocess.run(
+        "getprop ro.boot.slot_suffix", shell=True, capture_output=True, text=True
+    )
     if Cslot.returncode != 0:
         logger.warning("Failed to get slot suffix")
     Cslot = Cslot.stdout.strip()
 
-    BootParentDir = subprocess.run("getprop ro.frp.pst", shell=True, capture_output=True, text=True)
+    BootParentDir = subprocess.run(
+        "getprop ro.frp.pst", shell=True, capture_output=True, text=True
+    )
     if BootParentDir.returncode != 0:
         logger.warning("Failed to get FRP path")
     BootParentDir = BootParentDir.stdout.strip().rsplit("/", 1)[0]
@@ -209,10 +213,10 @@ def main():
         logger.warning(
             "No slot detected. Are you using a non-ab device? Now skiping slot check..."
         )
-    if os.geteuid() == 0:
+    if os.geteuid() and (args.install or args.ota) == 0:
         if args.install:
             logger.info(f"Will install patched boot image to current slot: {Cslot}")
-            flash_img(f"{wdir}/patched_boot.img",f"{BootParentDir}/boot{Cslot}")
+            flash_img(f"{wdir}/patched_boot.img", f"{BootParentDir}/boot{Cslot}")
         if args.ota:
             logger.info(f"Will install patched boot image to another slot: {Tslot}")
             flash_img(f"{wdir}/patched_boot.img", f"{BootParentDir}/boot{Tslot}")
@@ -221,6 +225,7 @@ def main():
         quit("")
     get_tool()
     patch_boot(IMAGEPATH)
+
 
 # 启动
 if __name__ == "__main__":
