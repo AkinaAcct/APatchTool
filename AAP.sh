@@ -128,7 +128,7 @@ if [ "${OS}" = "linux" -a -z "${BOOTPATH}" ]; then
     exit 1
 fi
 # 无 ROOT 并且未指定 BOOT 镜像路径则退出
-if [ -z "${BOOTPATH}" -a "${ROOT}" = "true" ]; then
+if [ -z "${BOOTPATH}" -a "${ROOT}" = "false" ]; then
     msg_fatal "No root and no boot image is specified. Aborted."
     exit 1
 fi
