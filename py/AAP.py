@@ -209,13 +209,18 @@ def main():
         logger.warning(
             "No slot detected. Are you using a non-ab device? Now skiping slot check..."
         )
+    if os.geteuid() == 0:
+        if args.install:
+            logger.info(f"Will install patched boot image to current slot: {Cslot}")
+            flash_img(f"{wdir}/patched_boot.img",f"{BootParentDir}/boot{Cslot}")
+        if args.ota:
+            logger.info(f"Will install patched boot image to another slot: {Tslot}")
+            flash_img(f"{wdir}/patched_boot.img", f"{BootParentDir}/boot{Tslot}")
+    else:
+        logger.fatal("No root detected! Flashing aborted.")
+        quit("")
     get_tool()
     patch_boot(IMAGEPATH)
-    if args.install:
-        flash_img(f"{wdir}/patched_boot.img",f"{BootParentDir}/boot{Cslot}")
-    if args.ota:
-        flash_img(f"{wdir}/patched_boot.img", f"{BootParentDir}/boot{Tslot}")
-
 
 # 启动
 if __name__ == "__main__":
