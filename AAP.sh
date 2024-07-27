@@ -29,17 +29,6 @@ msg_err() { # 打印消息 格式: "[ERROR] TIME: MSG"(RED)
 msg_fatal() { # 打印消息并停止运行 格式: "[FATAL] TIME: MSG"(RED)
     printf "${RED}[FATAL] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
-# ROOT 检测
-if [ "$(id -u)" -eq 0 ]; then
-    ROOT=true
-        # 检测到 Magisk Delta/Kitsune 立即退出 越南猴子早该死了 XD
-        if [ "$(magisk -v | grep "delta")" -o "$(magisk -v | grep "kitsune")" ];then
-            msg_fatal "Detected Magisk Deleta/Kitsune: Unsupported environment. Aborted."
-            exit 114
-        fi
-else
-    ROOT=false
-fi
 # OS 检测
 if command -v getprop >/dev/null 2>&1; then
     OS="android"
@@ -48,6 +37,20 @@ else
     OS="linux"
     msg_warn "You are using ${OS}. Using this script on ${OS} is still under testing."
 fi
+# ROOT 检测
+if [ "$(id -u)" -eq 0 ]; then
+    ROOT=true
+    # 检测到 Magisk Delta/Kitsune 立即退出 越南猴子早该死了 XD
+    if [ "${OS}" = "android" ]; then
+        if [ "$(magisk -v | grep "delta")" -o "$(magisk -v | grep "kitsune")" ]; then
+            msg_fatal "Detected Magisk Deleta/Kitsune: Unsupported environment. Aborted."
+            exit 114
+        fi
+    fi
+else
+    ROOT=false
+fi
+
 if [ -z "$(echo ${PREFIX} | grep -i termux)" -a "${OS}" = "android" ]; then
     msg_warn "Unsupported terminal app(not in Termux)."
 fi
