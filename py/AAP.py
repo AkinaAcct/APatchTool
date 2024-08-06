@@ -84,13 +84,13 @@ def get_tool():
         kpimg = f"https://github.com/bmax121/KernelPatch/releases/download/{kpver}/kpimg-android"
     mboot = "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/bin/magiskboot"
     logger.info(f"Downloading kptool-{operasys}...")
-    download_file(kptool, wdir + f"/kptool-{operasys}")
+    download_file(kptool, f"{wdir}/kptool-{operasys}")
     logger.info("Fininshed")
     logger.info("Downloading kpimg-android...")
-    download_file(kpimg, wdir + "/kpimg-android")
+    download_file(kpimg, f"{wdir}/kpimg-android")
     logger.info("Fininshed.")
     logger.info("Downloading magiskboot...")
-    download_file(mboot, wdir + "/magiskboot")
+    download_file(mboot, f"{wdir}/magiskboot")
     logger.info("Fininshed.")
     logger.info("Set perms...")
     for root, dirs, files in os.walk(wdir):
@@ -102,7 +102,7 @@ def get_tool():
 
 
 def patch_boot(bootpath):
-    copy_file(bootpath, wdir + "/boot.img")
+    copy_file(bootpath, f"{wdir}/boot.img")
     os.chdir(wdir)
     logger.info("Start unpack...")
     os.system(f"./magiskboot unpack boot.img")
