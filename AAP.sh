@@ -26,7 +26,7 @@ msg_warn() { # 打印消息 格式: "[WARN] TIME: MSG"(YELLOW)
 msg_err() { # 打印消息 格式: "[ERROR] TIME: MSG"(RED)
     printf "${RED}[ERROR] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
-msg_fatal() { # 打印消息并停止运行 格式: "[FATAL] TIME: MSG"(RED)
+msg_fatal() { # 打印消息 格式: "[FATAL] TIME: MSG"(RED)
     printf "${RED}[FATAL] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
 # OS 检测
