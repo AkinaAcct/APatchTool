@@ -3,7 +3,7 @@
 #shellcheck disable=SC2086
 get_device_boot() {
     msg_info "Getting boot image..."
-    if [ -z "${WORKDIR}/boot${BOOTSUFFIX}.img" ]; then
+    if [ -z "${BOOTPATH}" ]; then
         if [ -n "${BOOTSUFFIX}" ];then
             msg_info "Current boot slot: ${BOOTSUFFIX}"
         else
