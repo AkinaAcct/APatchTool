@@ -14,7 +14,6 @@ RED="\033[1;31m"        # RED
 YELLOW="\033[1;33m"     # YELLOW
 BLUE="\033[40;34m"      # BLUE
 RESET="\033[0m"         # RESET
-RANDOMNUM=$(date "+%N") # RANDOM NUMBER
 
 # 格式化打印消息
 msg_info() { # 打印消息 格式: "[INFO] TIME: MSG"(BLUE)
@@ -159,7 +158,7 @@ if [ -n "${SAVEROOT}" -a -n "${BOOTSUFFIX}" -a "${OS}" = "android" ]; then
     msg_warn "You have specified the installation to another slot. Current slot:${BOOTSUFFIX}. Slot to be flashed into:${TBOOTSUFFIX}."
 fi
 if [ -z "${SUPERKEY}" ]; then
-    SUPERKEY=${RANDOMNUM}
+    SUPERKEY="$(cat /proc/sys/kernel/random/uuid | cut -d \- -f1)"
 fi
 # 清理可能存在的上次运行文件
 rm -rf /tmp/LuoYanTmp_*
