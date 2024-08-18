@@ -166,7 +166,7 @@ rm -rf ./LuoYanTmp_*
 mkdir -p "${WORKDIR}"
 
 msg_info "Downloading function file from GitHub..."
-curl -L --progress-bar "https://raw.githubusercontent.com/nya-main/APatchAutoPatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
+curl -L --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
 EXITSTATUS=$?
 if [ $EXITSTATUS != 0 ]; then
     msg_fatal "Download failed. Check your Internet connection and try again."
