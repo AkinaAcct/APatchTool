@@ -130,17 +130,17 @@ if [ "${OS}" = "linux" -a -z "${BOOTPATH}" ]; then
     msg_fatal "You are using ${OS}, but there is no image specified by you. Aborted."
     exit 1
 fi
+if [ -e "${BOOTPATH}" -a ! -f "${BOOTPATH}" ];then
+    msg_fatal "You specified a path, but that path is not a file!"
+    exit 1
+fi
 # 无 ROOT 并且未指定 BOOT 镜像路径则退出
 if [ -z "${BOOTPATH}" -a "${ROOT}" = "false" ]; then
     msg_fatal "No root and no boot image is specified. Aborted."
     exit 1
 fi
 # 设置工作文件夹
-if [ "${OS}" = "android" ]; then
-    WORKDIR="./LuoYanTmp_${RANDOMNUM}"
-else
-    WORKDIR="/tmp/LuoYanTmp_${RANDOMNUM}"
-fi
+WORKDIR="$(mktemp -d --suffix=_AAP)"
 # 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
 if [ "${OS}" = "android" ]; then
     BYNAMEPATH=$(getprop ro.frp.pst | sed 's/\/frp//g')
