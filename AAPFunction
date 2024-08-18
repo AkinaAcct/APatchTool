@@ -4,9 +4,12 @@
 get_device_boot() {
     msg_info "Getting boot image..."
     if [ -z "${BOOTPATH}" ]; then
-        msg_info "Current boot: ${BOOTSUFFIX}(If empty: A-Only device)"
-        dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=${WORKDIR}/boot${BOOTSUFFIX}.img
-        EXITSTATUS=$?
+        if [ -n "${BOOTSUFFIX}" ];then
+            msg_info "Current boot slot: ${BOOTSUFFIX}"
+        else
+            msg_info "Current boot slot: A-Only,no slot."
+        fi
+        dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=${WORKDIR}/boot${BOOTSUFFIX}.img || EXITSTATUS=$?
         if [ $EXITSTATUS != 0 ]; then
             msg_fatal "Get boot image from device failed!"
         fi
