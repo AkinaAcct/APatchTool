@@ -142,8 +142,8 @@ else
     WORKDIR="/tmp/LuoYanTmp_${RANDOMNUM}"
 fi
 # 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
-BYNAMEPATH=$(getprop ro.frp.pst | sed 's/\/frp//g')
 if [ "${OS}" = "android" ]; then
+    BYNAMEPATH=$(getprop ro.frp.pst | sed 's/\/frp//g')
     if [ ! -e "${BYNAMEPATH}/boot" ]; then
         BOOTSUFFIX=$(getprop ro.boot.slot_suffix)
     fi
