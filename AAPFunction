@@ -12,6 +12,7 @@ get_device_boot() {
         dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=${WORKDIR}/boot${BOOTSUFFIX}.img || EXITSTATUS=$?
         if [ $EXITSTATUS != 0 ]; then
             msg_fatal "Get boot image from device failed!"
+            exit 1
         fi
     else
         msg_info "Now copying boot image to workdir..."
