@@ -57,7 +57,7 @@ print_help() {
     printf "${BLUE}%s${RESET}" "
 APatch Auto Patch Tool
 Written by Akina
-Version: 4.0.0
+Version: 5.0.0
 Current DIR: $(pwd)
 
 -h, -v,                 print the usage and version.
@@ -80,8 +80,12 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
         BOOTPATH="${OPTARG}"
         if [ -e "${BOOTPATH}" ]; then
             msg_info "Boot image path specified. Current image path: ${BOOTPATH}"
+            if [ -d "${BOOTPATH}" ];then
+                msg_fatal "${BOOTPATH}: Not a file."
+                exit 1
+            fi
         else
-            msg_fatal "${BOOTPATH}: No such file."
+            msg_fatal "${BOOTPATH}: The file does not exist."
             exit 1
         fi
         ;;
@@ -160,10 +164,6 @@ fi
 if [ -z "${SUPERKEY}" ]; then
     SUPERKEY="$(cat /proc/sys/kernel/random/uuid | cut -d \- -f1)"
 fi
-# 清理可能存在的上次运行文件
-rm -rf /tmp/LuoYanTmp_*
-rm -rf ./LuoYanTmp_*
-mkdir -p "${WORKDIR}"
 
 msg_info "Downloading function file from GitHub..."
 curl -L --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
