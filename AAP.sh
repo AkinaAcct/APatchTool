@@ -77,7 +77,7 @@ Current DIR: $(pwd)
 
 When the -s parameter is not specified, uuid will be used to generate an 8-digit SuperKey that is a mixture of alphanumeric characters.
 
-When the -d parameter is specified, the specified folder should contain magiskboot, kptools and kpimg, otherwise the run will fatal.
+When the -d parameter is specified, the specified folder should contain magiskboot, kptools and kpimg, otherwise you will get a fatal error.
 
 In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose mode.
 "
