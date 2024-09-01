@@ -85,6 +85,7 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
 }
 
 # 参数解析
+DOWNLOADKP=true
 while getopts ":hvi:k:IVs:Sd:E:" OPT; do
     case $OPT in
     h | v)
@@ -92,7 +93,6 @@ while getopts ":hvi:k:IVs:Sd:E:" OPT; do
         ;;
     d)
         WORKDIR="$(realpath ${OPTARG})"
-        DOWNLOADKP=true
         if [ -d "${WORKDIR}" ]; then
             msg_info "The work directory was manually specified: ${WORKDIR}. kptools and kpimg will not be downloaded again."
             DOWNLOADKP=false

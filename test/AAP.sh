@@ -77,7 +77,7 @@ Current DIR: $(pwd)
 
 When the -s parameter is not specified, uuid will be used to generate an 8-digit SuperKey that is a mixture of alphanumeric characters.
 
-When the -d parameter is specified, the specified folder should contain magiskboot, kptools and kpimg, otherwise the run will fatal.
+When the -d parameter is specified, the specified folder should contain magiskboot, kptools and kpimg, otherwise you will get a fatal error.
 
 In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose mode.
 "
@@ -85,6 +85,7 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
 }
 
 # 参数解析
+DOWNLOADKP=true
 while getopts ":hvi:k:IVs:Sd:E:" OPT; do
     case $OPT in
     h | v)
@@ -92,7 +93,6 @@ while getopts ":hvi:k:IVs:Sd:E:" OPT; do
         ;;
     d)
         WORKDIR="$(realpath ${OPTARG})"
-        DOWNLOADKP=true
         if [ -d "${WORKDIR}" ]; then
             msg_info "The work directory was manually specified: ${WORKDIR}. kptools and kpimg will not be downloaded again."
             DOWNLOADKP=false
@@ -101,8 +101,8 @@ while getopts ":hvi:k:IVs:Sd:E:" OPT; do
             exit 1
         fi
         for i in magiskboot kptools-${OS} kpimg-android; do
-            if [ ! -f "${WORKDIR}/${i}" ]; then
-                msg_fatal "Missing file: ${1}"
+            if [ ! -e "${WORKDIR}/${i}" ]; then
+                msg_fatal "Missing file: ${WORKDIR}/${i}"
                 exit 127
             fi
         done
@@ -223,7 +223,7 @@ else
 fi
 
 # 加载操作文件
-. ~/APatchTool/AAPFunction
+. ~/APatchTool//AAPFunction
 
 get_device_boot
 get_tools
