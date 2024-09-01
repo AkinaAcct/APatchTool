@@ -78,6 +78,9 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
 # 参数解析
 while getopts ":hvi:k:IVs:SE:" OPT; do
     case $OPT in
+    h | v)
+        print_help
+    ;;
     i)
         BOOTPATH="${OPTARG}"
         if [ -e "${BOOTPATH}" ]; then
@@ -90,9 +93,6 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
             msg_fatal "${BOOTPATH}: The file does not exist."
             exit 1
         fi
-        ;;
-    h | v)
-        print_help
         ;;
     S)
         SAVEROOT="true"
