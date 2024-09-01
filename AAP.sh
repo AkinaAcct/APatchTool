@@ -80,7 +80,7 @@ while getopts ":hvi:k:IVs:SE:" OPT; do
         BOOTPATH="${OPTARG}"
         if [ -e "${BOOTPATH}" ]; then
             msg_info "Boot image path specified. Current image path: ${BOOTPATH}"
-            if [ -d "${BOOTPATH}" ];then
+            if [ ! -f "${BOOTPATH}" ];then
                 msg_fatal "${BOOTPATH}: Not a file."
                 exit 1
             fi

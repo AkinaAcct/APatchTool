@@ -83,7 +83,7 @@ patch_boot() {
         msg_warn "Unpatch failed. Maybe you are using a unpatched boot image?"
         msg_warn "Now skipping unpatching..."
     else
-        msg_warn "Done."
+        msg_info "Done."
     fi
     msg_info "Patching image...Current Superkey: ${SUPERKEY}"
     ./kptools-${OS} --patch --kpimg kpimg-android --skey "${SUPERKEY}" --image kernel --out kernel ${EXTRAARGS}
