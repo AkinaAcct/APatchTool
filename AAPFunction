@@ -4,7 +4,7 @@
 get_device_boot() {
     msg_info "Getting boot image..."
     if [ -z "${BOOTPATH}" ]; then
-        if [ -n "${BOOTSUFFIX}" ];then
+        if [ -n "${BOOTSUFFIX}" ]; then
             msg_info "Current boot slot: ${BOOTSUFFIX}"
         else
             msg_info "Current boot slot: A-Only,no slot."
@@ -22,50 +22,56 @@ get_device_boot() {
 }
 get_tools() {
     cd "${WORKDIR}" || exit 1
-    msg_info "Downloading kptools-${OS}..."
-    if [ -n "${KPTOOLVER}" ]; then
-        msg_info "Use the specified version: ${KPTOOLVER}"
-    else
-        msg_info "Use the latest kptools."
-    fi
-    if [ -n "${KPTOOLVER}" ]; then
-        curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/download/${KPTOOLVER}/kptools-${OS}"
+    if [ "${DOWNLOADKP}" = "true" ]; then
+        msg_info "Downloading kptools-${OS}..."
+        if [ -n "${KPTOOLVER}" ]; then
+            msg_info "Use the specified version: ${KPTOOLVER}"
+        else
+            msg_info "Use the latest kptools."
+        fi
+        if [ -n "${KPTOOLVER}" ]; then
+            curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/download/${KPTOOLVER}/kptools-${OS}"
+            EXITSTATUS=$?
+        else
+            curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-${OS}"
+            EXITSTATUS=$?
+        fi
+        if [ $EXITSTATUS != 0 ]; then
+            msg_fatal "Download failed."
+            msg_fatal "Please check your internet connection."
+            exit 1
+        fi
+        chmod +x kptools-${OS}
+        msg_info "Done."
+        msg_info "Downloading kpimg-android..."
+        if [ -n "${KPTOOLVER}" ]; then
+            curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/download/${KPTOOLVER}/kpimg-android"
+            EXITSTATUS=$?
+        else
+            curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kpimg-android"
+            EXITSTATUS=$?
+        fi
+        if [ $EXITSTATUS != 0 ]; then
+            msg_fatal "Download failed."
+            msg_fatal "Please check your internet connection."
+            exit 1
+        fi
+        msg_info "Done."
+        msg_info "Downloading magiskboot..."
+        curl -LO --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/bin/magiskboot"
         EXITSTATUS=$?
-    else
-        curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kptools-${OS}"
-        EXITSTATUS=$?
+        if [ $EXITSTATUS != 0 ]; then
+            msg_fatal "Download failed."
+            msg_fatal "Please check your internet connection."
+            exit 1
+        fi
+        chmod +x magiskboot
+        msg_info "Done."
+    elif [ "${DOWNLOADKP}" = "false" ]; then
+        for i in magiskboot kptools-${OS} kpimg-android; do
+            chmod +x ${WORKDIR}/${i}
+        done
     fi
-    if [ $EXITSTATUS != 0 ]; then
-        msg_fatal "Download failed."
-        msg_fatal "Please check your internet connection."
-        exit 1
-    fi
-    chmod +x kptools-${OS}
-    msg_info "Done."
-    msg_info "Downloading kpimg-android..."
-    if [ -n "${KPTOOLVER}" ]; then
-        curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/download/${KPTOOLVER}/kpimg-android"
-        EXITSTATUS=$?
-    else
-        curl -LO --progress-bar "https://github.com/bmax121/KernelPatch/releases/latest/download/kpimg-android"
-        EXITSTATUS=$?
-    fi
-    if [ $EXITSTATUS != 0 ]; then
-        msg_fatal "Download failed."
-        msg_fatal "Please check your internet connection."
-        exit 1
-    fi
-    msg_info "Done."
-    msg_info "Downloading magiskboot..."
-    curl -LO --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/bin/magiskboot"
-    EXITSTATUS=$?
-    if [ $EXITSTATUS != 0 ]; then
-        msg_fatal "Download failed."
-        msg_fatal "Please check your internet connection."
-        exit 1
-    fi
-    chmod +x magiskboot
-    msg_info "Done."
 }
 
 patch_boot() {

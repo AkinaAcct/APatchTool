@@ -223,7 +223,7 @@ else
 fi
 
 # 加载操作文件
-. ${WORKDIR}/AAPFunction
+. ~/APatchTool/AAPFunction
 
 get_device_boot
 get_tools
