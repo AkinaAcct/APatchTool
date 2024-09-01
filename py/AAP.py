@@ -108,7 +108,7 @@ def patch_boot(bootpath):
     os.system(f"./magiskboot unpack boot.img")
     logger.info("Unpack fininshed.")
     logger.info("Start unpatch...")
-    os.system(f"./kptools-${operasys} --unpatch --image kernel --out kernel")
+    os.system(f"./kptools-{operasys} --unpatch --image kernel --out kernel")
     logger.info("Unpatch finished.")
     os.system(
         f'./kptool-{operasys} --patch --kpimg kpimg-android --skey "{skey}" --image kernel "{eargs}" --out kernel'
