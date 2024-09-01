@@ -101,8 +101,8 @@ while getopts ":hvi:k:IVs:Sd:E:" OPT; do
             exit 1
         fi
         for i in magiskboot kptools-${OS} kpimg-android; do
-            if [ ! -f "${WORKDIR}/${i}" ]; then
-                msg_fatal "Missing file: ${1}"
+            if [ ! -e "${WORKDIR}/${i}" ]; then
+                msg_fatal "Missing file: ${WORKDIR}/${i}"
                 exit 127
             fi
         done
