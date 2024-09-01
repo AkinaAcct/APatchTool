@@ -69,6 +69,8 @@ Current DIR: $(pwd)
 -E [ARGS],              Add args [ARGS] to kptools when patching.
 
 NOTE: When arg -I not provided, the patched boot image will be stored in /storage/emulated/0/patched_boot.img(on android) or \${HOME}/patched_boot.img(on linux).
+
+In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose mode.
 "
     exit 0
 }
