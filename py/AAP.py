@@ -222,9 +222,9 @@ def main():
         if args.ota:
             logger.info(f"Will install patched boot image to another slot: {Tslot}")
             flash_img(f"{wdir}/patched_boot.img", f"{BootParentDir}/boot{Tslot}")
-    else:
-        logger.fatal("No root detected! Flashing aborted.")
-        quit("")
+    elif args.install or args.ota:
+        logger.fatal("No root detected! You can's use these two args(--ota, --install)! Flashing aborted.")
+        quit()
     get_tool()
     patch_boot(IMAGEPATH)
 
