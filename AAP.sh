@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #by Akina | LuoYan
 #2024-06-03 Rewrite
 #shellcheck disable=SC2059,SC2086,SC2166
@@ -57,7 +57,7 @@ print_help() {
     printf "${BLUE}%s${RESET}\n\n" "
 APatch Auto Patch Tool
 Written by Akina
-Version: 5.0.0
+Version: 6.0.0
 Current DIR: $(pwd)
 
 -h, -v,                 print the usage and version.
@@ -65,6 +65,7 @@ Current DIR: $(pwd)
 -k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
 -d /PATH/TO/DIR         specify a folder containing kptools and kpimg as the kptools to be used.
 -s \"STRING\",            specify a superkey. Use STRING as superkey.
+-K,                     Specify the KPMs to be embedded.
 -I,                     directly install to current slot after patch.
 -S,                     Install to another slot (for OTA).
 -E [ARGS],              Add args [ARGS] to kptools when patching."
@@ -86,7 +87,7 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
 
 # 参数解析
 DOWNLOADKP=true
-while getopts ":hvi:k:IVs:Sd:E:" OPT; do
+while getopts ":hvi:k:KIVs:Sd:E:" OPT; do
     case $OPT in
     h | v)
         print_help
@@ -106,6 +107,10 @@ while getopts ":hvi:k:IVs:Sd:E:" OPT; do
                 exit 127
             fi
         done
+        ;;
+    K)
+        EMBEDKPMS=true
+        msg_info "The -K parameter was received. Will embed KPMs."
         ;;
     i)
         BOOTPATH="$(realpath ${OPTARG})"

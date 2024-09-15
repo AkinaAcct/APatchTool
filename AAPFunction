@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #rewrited
 #shellcheck disable=SC2086
 get_device_boot() {
@@ -73,8 +73,27 @@ get_tools() {
         done
     fi
 }
-
+analyze_kpms_path() {
+    unset KPMP # Reset array KPMP
+    while true; do
+        msg_info "Now enter your KPMs' path(Enter \"done\" to finish this operation): "
+        read TKPM
+        if [ "${TKPM}" = "done" ]; then
+            break
+        fi
+        KPMP+=($(realpath ${TKPM}))
+        msg_info "Current seleted KPMs: ${KPMP[*]}"
+        msg_info "Totally: ${#KPMP[@]}"
+    done
+    for i in "${KPMP[@]}"; do
+        EXTRAARGS+=" --embed-extra-path=$i --extra-type=kpm"
+    done
+    msg_info "Current EXTRAARGS: ${EXTRAARGS}"
+}
 patch_boot() {
+    if [ "${EMBEDKPMS}" = "true" ]; then
+        analyze_kpms_path
+    fi
     msg_info "Unpacking image..."
     ./magiskboot unpack boot${BOOTSUFFIX}.img
     EXITSTATUS=$?
