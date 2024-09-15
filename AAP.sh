@@ -65,6 +65,7 @@ Current DIR: $(pwd)
 -k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
 -d /PATH/TO/DIR         specify a folder containing kptools and kpimg as the kptools to be used.
 -s \"STRING\",            specify a superkey. Use STRING as superkey.
+-K,                     Specify the KPMs to be embedded.
 -I,                     directly install to current slot after patch.
 -S,                     Install to another slot (for OTA).
 -E [ARGS],              Add args [ARGS] to kptools when patching."
