@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #by Akina | LuoYan
 #2024-06-03 Rewrite
 #shellcheck disable=SC2059,SC2086,SC2166
@@ -86,7 +86,7 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
 
 # 参数解析
 DOWNLOADKP=true
-while getopts ":hvi:k:IVs:Sd:E:" OPT; do
+while getopts ":hvi:k:KIVs:Sd:E:" OPT; do
     case $OPT in
     h | v)
         print_help
@@ -106,6 +106,10 @@ while getopts ":hvi:k:IVs:Sd:E:" OPT; do
                 exit 127
             fi
         done
+        ;;
+    K)
+        EMBEDKPMS=true
+        msg_info "The -K parameter was received. Will embed KPMs."
         ;;
     i)
         BOOTPATH="$(realpath ${OPTARG})"
