@@ -11,7 +11,8 @@ This script has the following functions:
 - User-specified image path or get from current Android device.  
 - User-specified KernelPatch version. Or default, latest release.  
 - User-specified SuperKey.[What is SuperKey?](https://apatch.top/faq.html#what-is-superkey) 
-- Only patch but not install support.
+- Supports only patch but not install.
+- Supports embedding KPMs.
 
 > [!NOTE]
 > Because of some problems that may occur, support for all terminal software other than Termux has been dropped.
