@@ -57,7 +57,7 @@ print_help() {
     printf "${BLUE}%s${RESET}\n\n" "
 APatch Auto Patch Tool
 Written by Akina
-Version: 6.0.0
+Version: dev-$(git rev-parse --short HEAD): $(git log --pretty=format:%s $(git rev-parse HEAD) -1)
 Current DIR: $(pwd)
 
 -h, -v,                 print the usage and version.
@@ -78,7 +78,7 @@ Current DIR: $(pwd)
 
 When the -s parameter is not specified, uuid will be used to generate an 8-digit SuperKey that is a mixture of alphanumeric characters.
 
-When the -d parameter is specified, the specified folder should contain magiskboot, kptools and kpimg, otherwise you will get a fatal error.
+When the -d parameter is specified, the specified folder should contain AAPFunction, magiskboot, kptools and kpimg, otherwise you will get a fatal error.
 
 In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose mode.
 "
@@ -86,7 +86,7 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
 }
 
 # 参数解析
-DOWNLOADKP=true
+DOWNFILES=true
 while getopts ":hvi:k:KIVs:Sd:E:" OPT; do
     case $OPT in
     h | v)
@@ -96,7 +96,7 @@ while getopts ":hvi:k:KIVs:Sd:E:" OPT; do
         WORKDIR="$(realpath ${OPTARG})"
         if [ -d "${WORKDIR}" ]; then
             msg_info "The work directory was manually specified: ${WORKDIR}. kptools and kpimg will not be downloaded again."
-            DOWNLOADKP=false
+            DOWNFILES=false
         else
             msg_fatal "No such directory."
             exit 1
@@ -200,12 +200,14 @@ if [ -z "${SUPERKEY}" ]; then
     SUPERKEY="$(cat /proc/sys/kernel/random/uuid | cut -d \- -f1)"
 fi
 
-msg_info "Downloading function file from GitHub..."
-curl -L --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
-EXITSTATUS=$?
-if [ $EXITSTATUS != 0 ]; then
-    msg_fatal "Download failed. Check your Internet connection and try again."
-    exit 1
+if [[ "${DOWNFILES}" == "true" ]];then
+    msg_info "Downloading function file from GitHub..."
+    curl -L --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
+    EXITSTATUS=$?
+    if [ $EXITSTATUS != 0 ]; then
+        msg_fatal "Download failed. Check your Internet connection and try again."
+        exit 1
+    fi
 fi
 
 # 备份boot

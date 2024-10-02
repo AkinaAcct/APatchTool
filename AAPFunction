@@ -22,7 +22,7 @@ get_device_boot() {
 }
 get_tools() {
     cd "${WORKDIR}" || exit 1
-    if [ "${DOWNLOADKP}" = "true" ]; then
+    if [ "${DOWNFILES}" = "true" ]; then
         msg_info "Downloading kptools-${OS}..."
         if [ -n "${KPTOOLVER}" ]; then
             msg_info "Use the specified version: ${KPTOOLVER}"
@@ -67,7 +67,7 @@ get_tools() {
         fi
         chmod +x magiskboot
         msg_info "Done."
-    elif [ "${DOWNLOADKP}" = "false" ]; then
+    elif [ "${DOWNFILES}" = "false" ]; then
         for i in magiskboot kptools-${OS} kpimg-android; do
             chmod +x ${WORKDIR}/${i}
         done
@@ -75,15 +75,16 @@ get_tools() {
 }
 analyze_kpms_path() {
     unset KPMP # Reset array KPMP
-    while true; do
+    while [[ ${TKPM} != "done" ]]; do
         msg_info "Now enter your KPMs' path(Enter \"done\" to finish this operation): "
-        read TKPM
-        if [ "${TKPM}" = "done" ]; then
-            break
+        read -r -a TKPM
+        if [[ ! -f "$(realpath ${TKPM})" ]];then
+            msg_fatal "No such file!"
+        else
+            KPMP+=($(realpath ${TKPM}))
         fi
-        KPMP+=($(realpath ${TKPM}))
         msg_info "Current seleted KPMs: ${KPMP[*]}"
-        msg_info "Totally: ${#KPMP[@]}"
+        msg_info "Total: ${#KPMP[@]}"
     done
     for i in "${KPMP[@]}"; do
         EXTRAARGS+=" --embed-extra-path=$i --extra-type=kpm"
