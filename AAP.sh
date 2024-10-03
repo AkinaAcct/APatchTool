@@ -31,15 +31,12 @@ msg_fatal() { # 打印消息 格式: "[FATAL] TIME: MSG"(RED)
 # OS 检测
 if command -v getprop >/dev/null 2>&1; then
     OS="android"
-    msg_info "OS: ${OS}"
 else
     OS="linux"
-    msg_warn "You are using ${OS}. Using this script on ${OS} is still under testing."
 fi
 # ROOT 检测
 if [ "$(id -u)" -eq 0 ]; then
     ROOT=true
-    # 检测到 Magisk Delta/Kitsune 立即退出 越南猴子早该死了 XD
     if [ "${OS}" = "android" ]; then
         if [ "$(magisk -v | grep "delta")" -o "$(magisk -v | grep "kitsune")" ]; then
             msg_fatal "Detected Magisk Deleta/Kitsune: Unsupported environment. Aborted."
@@ -48,6 +45,7 @@ if [ "$(id -u)" -eq 0 ]; then
     fi
 else
     ROOT=false
+    msg_warn "You are running in unprivileged mode; some functionality may be limited."
 fi
 
 if [ -z "$(echo ${PREFIX} | grep -i termux)" -a "${OS}" = "android" ]; then
@@ -57,23 +55,23 @@ print_help() {
     printf "${BLUE}%s${RESET}\n\n" "
 APatch Auto Patch Tool
 Written by Akina
-Version: 6.0.0
+Version: 7.0.0
 Current DIR: $(pwd)
 
 -h, -v,                 print the usage and version.
--i [BOOT IMAGE PATH],   specify a boot image path.
+-i PATH/TO/IMAGE,       specify a boot image path.
 -k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
--d /PATH/TO/DIR         specify a folder containing kptools and kpimg as the kptools to be used.
+-d PATH/TO/DIR,         specify a folder containing AAPFunction, kptools and kpimg that we need.
 -s \"STRING\",            specify a superkey. Use STRING as superkey.
 -K,                     Specify the KPMs to be embedded.
 -I,                     directly install to current slot after patch.
 -S,                     Install to another slot (for OTA).
--E [ARGS],              Add args [ARGS] to kptools when patching."
-
+-E [ARGS],              Add args [ARGS] to kptools when patching.
+-c [COMMANDS],          Specifies extra commands to run (developers only)."
     TWIDTH=$(tput cols)
     TEXTLEN=${#text}
     MIDPOS=$(((TWIDTH - TEXTLEN) / 2))
-    printf "${BLUE}%*s${RESET}\n\n" $MIDPOS "NOTE"
+    printf "${BLUE}%*s${RESET}\n" $MIDPOS "NOTE"
     printf "${BLUE}%s${RESET}\n" "When arg -I is not specified, the patched boot image will be stored in /storage/emulated/0/patched_boot.img(on android) or \${HOME}/patched_boot.img(on linux).
 
 When the -s parameter is not specified, uuid will be used to generate an 8-digit SuperKey that is a mixture of alphanumeric characters.
@@ -87,26 +85,35 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
 
 # 参数解析
 DOWNFILES=true
-while getopts ":hvi:k:KIVs:Sd:E:" OPT; do
+while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
+    # $OPTARG
     case $OPT in
+    c)
+        bash -c "$OPTARG"
+        ;;
     h | v)
         print_help
         ;;
     d)
+        MISSINGFILES=0
         WORKDIR="$(realpath ${OPTARG})"
-        if [ -d "${WORKDIR}" ]; then
-            msg_info "The work directory was manually specified: ${WORKDIR}. kptools and kpimg will not be downloaded again."
-            DOWNFILES=false
-        else
+        if [ ! -d "${WORKDIR}" ]; then
             msg_fatal "No such directory."
             exit 1
         fi
-        for i in magiskboot kptools-${OS} kpimg-android; do
+        for i in AAPFunction magiskboot kptools-${OS} kpimg-android; do
             if [ ! -e "${WORKDIR}/${i}" ]; then
                 msg_fatal "Missing file: ${WORKDIR}/${i}"
-                exit 127
+                MISSINGFILES=$((MISSINGFILES + 1))
             fi
         done
+        if [[ ${MISSINGFILES} -gt 0 ]]; then
+            msg_fatal "There are ${MISSINGFILES} files missing, and we need 4 files in total. Please read the instructions in ${0} -h."
+            msg_info "Omit the -d parameter; the file will be downloaded remotely."
+        else
+            msg_info "The work directory was manually specified: ${WORKDIR}. AAPFunction, kptools and kpimg will not be downloaded again."
+            DOWNFILES=false
+        fi
         ;;
     K)
         EMBEDKPMS=true
@@ -177,7 +184,7 @@ if [ -z "${BOOTPATH}" -a "${ROOT}" = "false" ]; then
 fi
 # 设置工作文件夹
 if [ -z "${WORKDIR}" ]; then
-    WORKDIR="$(mktemp -d --suffix=_AAP)"
+    WORKDIR="$(mktemp -d)"
 fi
 # 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
 if [ "${OS}" = "android" ]; then
@@ -186,8 +193,9 @@ if [ "${OS}" = "android" ]; then
         BOOTSUFFIX=$(getprop ro.boot.slot_suffix)
     fi
 else
-    msg_warn "Current OS is not Android. Skip boot slot check."
+    msg_info "Current OS is not Android. Skip boot slot check."
 fi
+# 判断OTA保root应使用的槽位
 if [ -n "${SAVEROOT}" -a -n "${BOOTSUFFIX}" -a "${OS}" = "android" ]; then
     if [ "${BOOTSUFFIX}" = "_a" ]; then
         TBOOTSUFFIX="_b"
@@ -196,11 +204,12 @@ if [ -n "${SAVEROOT}" -a -n "${BOOTSUFFIX}" -a "${OS}" = "android" ]; then
     fi
     msg_warn "You have specified the installation to another slot. Current slot:${BOOTSUFFIX}. Slot to be flashed into:${TBOOTSUFFIX}."
 fi
+# 未指定superkey则使用uuid生成
 if [ -z "${SUPERKEY}" ]; then
     SUPERKEY="$(cat /proc/sys/kernel/random/uuid | cut -d \- -f1)"
 fi
 
-if [[ "${DOWNFILES}" == "true" ]];then
+if [[ "${DOWNFILES}" == "true" ]]; then
     msg_info "Downloading function file from GitHub..."
     curl -L --progress-bar "https://raw.githubusercontent.com/AkinaAcct/APatchTool/main/AAPFunction" -o ${WORKDIR}/AAPFunction
     EXITSTATUS=$?
@@ -211,22 +220,23 @@ if [[ "${DOWNFILES}" == "true" ]];then
 fi
 
 # 备份boot
-if ${ROOT}; then
-    if [ "${OS}" = "android" ]; then
+msg_info "Now backing up the boot image..."
+if [ "${ROOT}" == "true" ]; then
+    if [ "${OS}" == "android" ]; then
         msg_info "Backing up boot image..."
         dd if=${BYNAMEPATH}/boot${BOOTSUFFIX} of=/storage/emulated/0/stock_boot${BOOTSUFFIX}.img
         EXITSTATUS=$?
         if [ "${EXITSTATUS}" != "0" ]; then
             msg_err "Boot image backup failed."
-            msg_warn "Now skiping backingup boot image..."
+            msg_warn "Skip backing up boot image..."
         else
             msg_info "Done. Boot image path: /storage/emulated/0/stock_boot${BOOTSUFFIX}.img"
         fi
     else
-        msg_info "Current OS: ${OS}. Skiping backup..."
+        msg_info "Currently OS in not Android; Skip backup."
     fi
 else
-    msg_warn "No root. Skiping backup..."
+    msg_warn "No root. Skip back up."
 fi
 
 # 加载操作文件

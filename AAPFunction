@@ -22,7 +22,7 @@ get_device_boot() {
 }
 get_tools() {
     cd "${WORKDIR}" || exit 1
-    if [ "${DOWNFILES}" = "true" ]; then
+    if [ "${DOWNFILES}" == "true" ]; then
         msg_info "Downloading kptools-${OS}..."
         if [ -n "${KPTOOLVER}" ]; then
             msg_info "Use the specified version: ${KPTOOLVER}"
@@ -67,7 +67,7 @@ get_tools() {
         fi
         chmod +x magiskboot
         msg_info "Done."
-    elif [ "${DOWNFILES}" = "false" ]; then
+    else
         for i in magiskboot kptools-${OS} kpimg-android; do
             chmod +x ${WORKDIR}/${i}
         done
@@ -78,8 +78,8 @@ analyze_kpms_path() {
     while [[ ${TKPM} != "done" ]]; do
         msg_info "Now enter your KPMs' path(Enter \"done\" to finish this operation): "
         read -r -a TKPM
-        if [[ ! -f "$(realpath ${TKPM})" ]];then
-            msg_fatal "No such file!"
+        if [[ ! -f "$(realpath ${TKPM})" ]]; then
+            msg_err "No such file!"
         else
             KPMP+=($(realpath ${TKPM}))
         fi
