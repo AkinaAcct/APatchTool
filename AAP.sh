@@ -55,7 +55,7 @@ print_help() {
     printf "${BLUE}%s${RESET}\n\n" "
 APatch Auto Patch Tool
 Written by Akina
-Version: dev-$(git rev-parse --short HEAD): $(git log --pretty=format:%s $(git rev-parse HEAD) -1)
+Version: 7.0.0
 Current DIR: $(pwd)
 
 -h, -v,                 print the usage and version.
