@@ -34,28 +34,11 @@ if command -v getprop >/dev/null 2>&1; then
 else
     OS="linux"
 fi
-# ROOT 检测
-if [ "$(id -u)" -eq 0 ]; then
-    ROOT=true
-    if [ "${OS}" = "android" ]; then
-        if [ "$(magisk -v | grep "delta")" -o "$(magisk -v | grep "kitsune")" ]; then
-            msg_fatal "Detected Magisk Deleta/Kitsune: Unsupported environment. Aborted."
-            exit 114
-        fi
-    fi
-else
-    ROOT=false
-    msg_warn "You are running in unprivileged mode; some functionality may be limited."
-fi
-
-if [ -z "$(echo ${PREFIX} | grep -i termux)" -a "${OS}" = "android" ]; then
-    msg_warn "Unsupported terminal app(not in Termux)."
-fi
 print_help() {
     printf "${BLUE}%s${RESET}\n\n" "
 APatch Auto Patch Tool
 Written by Akina
-Version: 7.0.0
+Version: dev-$(git rev-parse --short HEAD): $(git log --pretty=format:%s $(git rev-parse HEAD) -1)
 Current DIR: $(pwd)
 
 -h, -v,                 print the usage and version.
@@ -98,7 +81,7 @@ while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
         MISSINGFILES=0
         WORKDIR="$(realpath ${OPTARG})"
         if [ ! -d "${WORKDIR}" ]; then
-            msg_fatal "No such directory."
+            msg_fatal "${WORKDIR}: No such directory."
             exit 1
         fi
         for i in AAPFunction magiskboot kptools-${OS} kpimg-android; do
@@ -111,8 +94,8 @@ while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
             msg_fatal "There are ${MISSINGFILES} files missing, and we need 4 files in total. Please read the instructions in ${0} -h."
             msg_info "Omit the -d parameter; the file will be downloaded remotely."
         else
-            msg_info "The work directory was manually specified: ${WORKDIR}. AAPFunction, kptools and kpimg will not be downloaded again."
             DOWNFILES=false
+            msg_info "The work directory was manually specified: ${WORKDIR}. AAPFunction, kptools and kpimg will not be downloaded again."
         fi
         ;;
     K)
@@ -168,6 +151,20 @@ while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
         ;;
     esac
 done
+
+# ROOT 检测
+if [ "$(id -u)" -eq 0 ]; then
+    ROOT=true
+    if [ "${OS}" = "android" ]; then
+        if [ "$(magisk -v | grep "delta")" -o "$(magisk -v | grep "kitsune")" ]; then
+            msg_fatal "Detected Magisk Deleta/Kitsune: Unsupported environment. Aborted."
+            exit 114
+        fi
+    fi
+else
+    ROOT=false
+    msg_warn "You are running in unprivileged mode; some functionality may be limited."
+fi
 # 镜像路径检测(For Linux)
 if [ "${OS}" = "linux" -a -z "${BOOTPATH}" ]; then
     msg_fatal "You are using ${OS}, but there is no image specified by you. Aborted."
