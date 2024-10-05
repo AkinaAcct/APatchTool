@@ -4,7 +4,7 @@
 #shellcheck disable=SC2059,SC2086,SC2166
 
 # TODO:
-# 1. 检测用户输入的SuperKey是否合规(八位，两种字符混合)
+# - None
 
 if [ -n "${APTOOLDEBUG}" ]; then
     if [ ${APTOOLDEBUG} -eq 1 ]; then
@@ -12,26 +12,26 @@ if [ -n "${APTOOLDEBUG}" ]; then
         set -x
     fi
 fi
-# 特殊变量
+# color vars
 RED="\033[1;31m"    # RED
 YELLOW="\033[1;33m" # YELLOW
 BLUE="\033[40;34m"  # BLUE
 RESET="\033[0m"     # RESET
 
-# 格式化打印消息
-msg_info() { # 打印消息 格式: "[INFO] TIME: MSG"(BLUE)
+# formatted print
+msg_info() {
     printf "${BLUE}[INFO] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
-msg_warn() { # 打印消息 格式: "[WARN] TIME: MSG"(YELLOW)
+msg_warn() {
     printf "${YELLOW}[WARN] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
-msg_err() { # 打印消息 格式: "[ERROR] TIME: MSG"(RED)
+msg_err() {
     printf "${RED}[ERROR] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
-msg_fatal() { # 打印消息 格式: "[FATAL] TIME: MSG"(RED)
+msg_fatal() {
     printf "${RED}[FATAL] $(date "+%H:%M:%S"): ${1}${RESET}\n"
 }
-# OS 检测
+# check OS
 if command -v getprop >/dev/null 2>&1; then
     OS="android"
 else
@@ -69,7 +69,7 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
     exit 0
 }
 
-# 参数解析
+# analyze args
 DOWNFILES=true
 while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
     # $OPTARG
@@ -145,7 +145,7 @@ while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
         # Check letters and symbols
         elif [[ "$SUPERKEY" =~ [A-Za-z] && "$SUPERKEY" =~ [\@\#\$\%\^\&\*\(\)\_\+\!\~\-\=] ]]; then
             ISOK=true
-        # Checking numbers and symbols
+        # Check numbers and symbols
         elif [[ "$SUPERKEY" =~ [0-9] && "$SUPERKEY" =~ [\@\#\$\%\^\&\*\(\)\_\+\!\~\-\=] ]]; then
             ISOK=true
         else
@@ -176,7 +176,7 @@ while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
     esac
 done
 
-# ROOT 检测
+# check root
 if [ "$(id -u)" -eq 0 ]; then
     ROOT=true
     if [ "${OS}" = "android" ]; then
@@ -189,7 +189,7 @@ else
     ROOT=false
     msg_warn "You are running in unprivileged mode; some functionality may be limited."
 fi
-# 镜像路径检测(For Linux)
+# check image path(for linux)
 if [ "${OS}" = "linux" -a -z "${BOOTPATH}" ]; then
     msg_fatal "You are using ${OS}, but there is no image specified by you. Aborted."
     exit 1
@@ -198,16 +198,16 @@ if [ -e "${BOOTPATH}" -a ! -f "${BOOTPATH}" ]; then
     msg_fatal "You specified a path, but that path is not a file!"
     exit 1
 fi
-# 无 ROOT 并且未指定 BOOT 镜像路径则退出
+# Exit when there is no root and no boot image is specified
 if [ -z "${BOOTPATH}" -a "${ROOT}" = "false" ]; then
     msg_fatal "No root and no boot image is specified. Aborted."
     exit 1
 fi
-# 设置工作文件夹
+# set WORKDIR
 if [ -z "${WORKDIR}" ]; then
     WORKDIR="$(mktemp -d)"
 fi
-# 判断用户设备是否为ab分区，是则设置$BOOTSUFFIX
+# Determine whether the user device is ab partition, if so, set BOOTSUFFIX
 if [ "${OS}" = "android" ]; then
     BYNAMEPATH=$(getprop ro.frp.pst | sed 's/\/frp//g')
     if [ ! -e "${BYNAMEPATH}/boot" ]; then
@@ -216,7 +216,7 @@ if [ "${OS}" = "android" ]; then
 else
     msg_info "Current OS is not Android. Skip boot slot check."
 fi
-# 判断OTA保root应使用的槽位
+# Determine the slot where OTA should be installed
 if [ -n "${SAVEROOT}" -a -n "${BOOTSUFFIX}" -a "${OS}" = "android" ]; then
     if [ "${BOOTSUFFIX}" = "_a" ]; then
         TBOOTSUFFIX="_b"
@@ -225,7 +225,7 @@ if [ -n "${SAVEROOT}" -a -n "${BOOTSUFFIX}" -a "${OS}" = "android" ]; then
     fi
     msg_warn "You have specified the installation to another slot. Current slot:${BOOTSUFFIX}. Slot to be flashed into:${TBOOTSUFFIX}."
 fi
-# 未指定superkey则使用uuid生成
+# If SuperKey is not specified, it will be generated using uuid
 if [ -z "${SUPERKEY}" ]; then
     SUPERKEY="$(cat /proc/sys/kernel/random/uuid | cut -d \- -f1)"
 fi
@@ -240,7 +240,7 @@ if [[ "${DOWNFILES}" == "true" ]]; then
     fi
 fi
 
-# 备份boot
+# backup boot
 msg_info "Now backing up the boot image..."
 if [ "${ROOT}" == "true" ]; then
     if [ "${OS}" == "android" ]; then
@@ -260,7 +260,7 @@ else
     msg_warn "No root. Skip back up."
 fi
 
-# 加载操作文件
+# load function file
 . ${WORKDIR}/AAPFunction
 
 get_device_boot
