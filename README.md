@@ -10,12 +10,14 @@ This script has the following functions:
 
 - User-specified image path or get from current Android device.  
 - User-specified KernelPatch version. Or default, latest release.  
-- User-specified SuperKey.[What is SuperKey?](https://apatch.top/faq.html#what-is-superkey) 
-- Supports only patch but not install.
+- User-specified SuperKey. [What is SuperKey?](https://apatch.top/faq.html#what-is-superkey) 
+- Supports directly install.
+- Supports OTA updates.
 - Supports embedding KPMs.
 
 > [!NOTE]
-> Because of some problems that may occur, support for all terminal software other than Termux has been dropped.
+> Because of some problems that may occur, support for all terminal software other than [Termux](https://github.com/Termux/termux-app) has been dropped.
+> With other terminal softwares, you will get a warning and we are not responsible for problems that arise.
 
 ---
 
@@ -25,25 +27,23 @@ This script has the following functions:
 
 - Prepare
 
-```bash
+```sh
 cd ${HOME}
 curl -LO https://raw.githubusercontent.com/AkinaAcct/APatchAutoPatchTool/main/AAP.sh
 chmod +x AAP.sh
 ```
 
-*After this, You can directly run AAP.sh after command `tsu` is executed.*
-
 - Run
 
 Usage:
 
-```shell
+```sh
 ./AAP.sh -h
 ```
 
-To enable debug mode, run:
+If you have issues or need feedback, please run `AAP.sh` in debug mode. To enable debug mode, run:
 
-```
+```sh
 APTOOLDEBUG=1 ./AAP.sh [ARGS]
 ```
 
