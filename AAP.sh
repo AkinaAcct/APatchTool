@@ -3,6 +3,9 @@
 #2024-06-03 Rewrite
 #shellcheck disable=SC2059,SC2086,SC2166
 
+# TODO:
+# 1. 检测用户输入的SuperKey是否合规(八位，两种字符混合)
+
 if [ -n "${APTOOLDEBUG}" ]; then
     if [ ${APTOOLDEBUG} -eq 1 ]; then
         printf "[\033[1;33m[WARN] $(date "+%H:%M:%S"): Debug mode is on.\033[0m\n"
@@ -91,6 +94,7 @@ while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
             fi
         done
         if [[ ${MISSINGFILES} -gt 0 ]]; then
+            unset WORKDIR
             msg_fatal "There are ${MISSINGFILES} files missing, and we need 4 files in total. Please read the instructions in ${0} -h."
             msg_info "Omit the -d parameter; the file will be downloaded remotely."
         else
@@ -130,7 +134,27 @@ while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
         ;;
     s)
         SUPERKEY="${OPTARG}"
-        msg_info "The -s parameter was received. Currently specified SuperKey: ${SUPERKEY}."
+        # Check password length
+        if [[ ${#SUPERKEY} -lt 8 ]]; then
+            msg_fatal "The SuperKey is too short! It should be at least eight characters long and contain at least two of the following: numbers, letters, and symbols."
+            exit 1
+        fi
+        # Check letters and numbers
+        if [[ "$SUPERKEY" =~ [A-Za-z] && "$SUPERKEY" =~ [0-9] ]]; then
+            ISOK=true
+        # Check letters and symbols
+        elif [[ "$SUPERKEY" =~ [A-Za-z] && "$SUPERKEY" =~ [\@\#\$\%\^\&\*\(\)\_\+\!\~\-\=] ]]; then
+            ISOK=true
+        # Checking numbers and symbols
+        elif [[ "$SUPERKEY" =~ [0-9] && "$SUPERKEY" =~ [\@\#\$\%\^\&\*\(\)\_\+\!\~\-\=] ]]; then
+            ISOK=true
+        else
+            ISOK=false
+        fi
+        case ${ISOK} in
+        true) msg_info "Valid SuperKey. Current SuperKey: ${SUPERKEY}" ;;
+        false) msg_fatal "You input a SuperKey that does not meet standards! It should be at least eight characters long and contain at least two of the following: numbers, letters, and symbols." && exit 1 ;;
+        esac
         ;;
     k)
         KPTOOLVER="${OPTARG}"
