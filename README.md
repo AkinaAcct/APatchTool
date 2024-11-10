@@ -1,14 +1,10 @@
+![socialify](https://socialify.git.ci/AkinaAcct/APatchTool/image?description=1&forks=1&issues=1&name=1&owner=1&pulls=1&stargazers=1&theme=Dark)
+
 # APatchTool
 
-Aka. APatch Auto Patch Tool
+## What is this
 
-A script that provides custom patching options.
-> [!WARNING]
-> Still under testing!
-
----
-
-This script has the following functions:
+A script automating the process of patching the kernel with [KernelPatch](https://github.com/bmax121/KernelPatch), and supports the following features:
 
 - User-specified image path or get from current Android device.  
 - User-specified KernelPatch version. Or default, latest release.  
@@ -16,8 +12,6 @@ This script has the following functions:
 - Supports directly install.
 - Supports OTA updates.
 - Supports embedding KPMs.
-
----
 
 ## Usage
 
