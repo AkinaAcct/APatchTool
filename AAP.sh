@@ -55,7 +55,7 @@ Current DIR: $(pwd)
 -E [ARGS],              Add args [ARGS] to kptools when patching.
 -c [COMMANDS],          Specifies extra commands to run (developers only)."
     TWIDTH=$(tput cols)
-    TEXTLEN=${#text}
+    TEXTLEN=4
     MIDPOS=$(((TWIDTH - TEXTLEN) / 2))
     printf "${BLUE}%*s${RESET}\n" $MIDPOS "NOTE"
     printf "${BLUE}%s${RESET}\n" "When arg -I is not specified, the patched boot image will be stored in /storage/emulated/0/patched_boot.img(on android) or \${HOME}/patched_boot.img(on linux).
