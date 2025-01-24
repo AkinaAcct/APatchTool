@@ -8,7 +8,7 @@
 
 if [ -n "${APTOOLDEBUG}" ]; then
     if [ ${APTOOLDEBUG} -eq 1 ]; then
-        printf "[\033[1;33m[WARN] $(date "+%H:%M:%S"): Debug mode is on.\033[0m\n"
+        printf "\033[1;33m[WARN] $(date "+%H:%M:%S"): Debug mode is on.\033[0m\n"
         set -x
     fi
 fi
