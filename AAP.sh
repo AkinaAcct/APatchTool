@@ -49,6 +49,7 @@ Current DIR: $(pwd)
 -k [RELEASE NAME],      specify a kernelpatch version [RELEASE NAME].
 -d PATH/TO/DIR,         specify a folder containing AAPFunction, kptools and kpimg that we need.
 -s \"STRING\",            specify a superkey. Use STRING as superkey.
+-A [PATH],                     Download latest APatch CI build to PATH.
 -K,                     Specify the KPMs to be embedded.
 -I,                     directly install to current slot after patch.
 -S,                     Install to another slot (for OTA).
@@ -71,7 +72,7 @@ In addition, you can use \`APTOOLDEBUG=1 ${0} [ARGS]\` format to enter verbose m
 
 # analyze args
 DOWNFILES=true
-while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
+while getopts ":hA:vi:k:KIVs:Sd:E:c:" OPT; do
     # $OPTARG
     case $OPT in
     c)
@@ -79,6 +80,10 @@ while getopts ":hvi:k:KIVs:Sd:E:c:" OPT; do
         ;;
     h | v)
         print_help
+        ;;
+    A)
+        DOWNLOAD_ANDROID_VER=true
+        DOWNLOAD_PATH="$(realpath ${OPTARG})"
         ;;
     d)
         MISSINGFILES=0
@@ -188,6 +193,22 @@ if [ "$(id -u)" -eq 0 ]; then
 else
     ROOT=false
     msg_warn "You are running in unprivileged mode; some functionality may be limited."
+fi
+# Download latest ci section
+if [[ "${DOWNLOAD_ANDROID_VER}" == "true" ]]; then
+    if [[ ! -e "${DOWNLOAD_PATH}" ]]; then
+        msg_fatal "${DOWNLOAD_PATH} do not exist."
+        exit 1
+    fi
+    msg_info "Now downloading..."
+    curl -L --progress-bar "https://nightly.link/bmax121/APatch/workflows/build/main/APatch.zip" -o "${DOWNLOAD_PATH}/APatch.zip" || ES=$?
+    if [[ ${ES} -eq 0 ]]; then
+        msg_info "Done."
+        exit 0
+    else
+        msg_fatal "Download Failed. Check the err msg above and try again."
+        exit 1
+    fi
 fi
 # check image path(for linux)
 if [ "${OS}" = "linux" -a -z "${BOOTPATH}" ]; then
